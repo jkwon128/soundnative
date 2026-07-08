@@ -28,16 +28,28 @@ function App() {
         <div className="quest-phrase">"{quest.phrase}"</div>
 
         <div className="answers">
-          {quest.answers.map((answer) => (
-            <button
-              key={answer.id}
-              className="answer-button"
-              disabled={selectedAnswer !== undefined}
-              onClick={() => setSelectedId(answer.id)}
-            >
-              {answer.text}
-            </button>
-          ))}
+          {quest.answers.map((answer) => {
+            let stateClass = ''
+            if (selectedAnswer) {
+              if (answer.correct) {
+                stateClass = 'correct'
+              } else if (answer.id === selectedId) {
+                stateClass = 'incorrect'
+              } else {
+                stateClass = 'muted'
+              }
+            }
+            return (
+              <button
+                key={answer.id}
+                className={`answer-button ${stateClass}`.trim()}
+                disabled={selectedAnswer !== undefined}
+                onClick={() => setSelectedId(answer.id)}
+              >
+                {answer.text}
+              </button>
+            )
+          })}
         </div>
 
         {selectedAnswer && (

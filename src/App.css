@@ -58,7 +58,26 @@
 
 .answer-button:disabled {
   cursor: default;
-  opacity: 0.6;
+}
+
+.answer-button.correct {
+  background: #e6f4ea;
+  border-color: #2e7d32;
+  color: #1e4620;
+  font-weight: bold;
+}
+
+.answer-button.incorrect {
+  background: #fdecea;
+  border-color: #c62828;
+  color: #7f1d1d;
+  font-weight: bold;
+}
+
+.answer-button.muted {
+  background: #f5f5f5;
+  border-color: #ddd;
+  color: #888;
 }
 
 .result {
