@@ -1,0 +1,79 @@
+.decode-app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: sans-serif;
+  color: #111;
+}
+
+.decode-title {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+.decode-subtitle {
+  color: #666;
+  margin: 0 0 24px;
+}
+
+.decode-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.decode-button {
+  margin-top: 12px;
+  padding: 12px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+}
+
+.decode-button:disabled {
+  background: #999;
+  cursor: default;
+}
+
+.decode-status {
+  margin-top: 16px;
+  color: #666;
+}
+
+.decode-error {
+  margin-top: 16px;
+  color: #c62828;
+}
+
+.decode-result {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.decode-field {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.decode-field-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.decode-field-value {
+  color: #111;
+}
