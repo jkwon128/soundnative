@@ -22,7 +22,7 @@ export function getDayIndex(dateString: string): number {
   return Math.floor(Date.UTC(year, month - 1, day) / 86400000)
 }
 
-function getPreviousDateString(dateString: string): string {
+export function getYesterdayDateString(dateString: string): string {
   const [year, month, day] = dateString.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, day))
   date.setUTCDate(date.getUTCDate() - 1)
@@ -31,7 +31,7 @@ function getPreviousDateString(dateString: string): string {
 
 export function computeNextStreak(prev: StreakState, today: string): number {
   if (prev.lastPlayedDate === today) return prev.streak
-  if (prev.lastPlayedDate === getPreviousDateString(today)) return prev.streak + 1
+  if (prev.lastPlayedDate === getYesterdayDateString(today)) return prev.streak + 1
   return 1
 }
 
@@ -51,6 +51,15 @@ export function saveStreak(state: StreakState): void {
     if (state.lastPlayedDate) {
       localStorage.setItem(LAST_PLAYED_KEY, state.lastPlayedDate)
     }
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}
+
+export function clearStreak(): void {
+  try {
+    localStorage.removeItem(STREAK_KEY)
+    localStorage.removeItem(LAST_PLAYED_KEY)
   } catch {
     // localStorage unavailable (e.g. private browsing) — ignore
   }
