@@ -13,6 +13,13 @@
   color: #666;
 }
 
+.streak-badge {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #d97706;
+}
+
 .headline {
   font-size: 28px;
   margin: 12px 0 28px;

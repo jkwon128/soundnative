@@ -1,24 +1,42 @@
 import { useState } from 'react'
 import './App.css'
 import { quizQuestions } from './quizData'
+import {
+  computeNextStreak,
+  getDayIndex,
+  getTodayDateString,
+  loadStreak,
+  saveStreak,
+  type StreakState,
+} from './dailyQuest'
 
 interface QuestScreenProps {
   onContinue: () => void
 }
 
 function QuestScreen({ onContinue }: QuestScreenProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const today = getTodayDateString()
+  const questionIndex = getDayIndex(today) % quizQuestions.length
+  const quest = quizQuestions[questionIndex]
+
+  const [streakState, setStreakState] = useState<StreakState>(() => loadStreak())
+  const [alreadySolvedToday] = useState(() => streakState.lastPlayedDate === today)
   const [wrongChoices, setWrongChoices] = useState<number[]>([])
   const [correct, setCorrect] = useState(false)
-
-  const isComplete = currentIndex >= quizQuestions.length
-  const quest = quizQuestions[currentIndex]
 
   const handleSelect = (choiceIndex: number) => {
     if (correct || wrongChoices.includes(choiceIndex)) return
 
     if (choiceIndex === quest.answer) {
       setCorrect(true)
+      setStreakState((prev) => {
+        const next: StreakState = {
+          streak: computeNextStreak(prev, today),
+          lastPlayedDate: today,
+        }
+        saveStreak(next)
+        return next
+      })
     } else {
       setWrongChoices((prev) => [...prev, choiceIndex])
     }
@@ -28,23 +46,18 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
     setWrongChoices([])
   }
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => prev + 1)
-    setWrongChoices([])
-    setCorrect(false)
-  }
+  const streakBadge = <div className="streak-badge">🔥 {streakState.streak}일 연속</div>
 
-  if (isComplete) {
+  if (alreadySolvedToday) {
     return (
       <div className="app">
         <div className="logo">SoundNative</div>
+        {streakBadge}
         <h1 className="headline">Sound like a native</h1>
 
         <div className="quest-card">
-          <div className="quest-complete-title">오늘의 퀘스트 완료!</div>
-          <div className="quest-complete-text">
-            오늘 준비한 문제를 모두 풀었어요. 잘하셨어요!
-          </div>
+          <div className="quest-complete-title">오늘의 퀘스트는 완료했어요!</div>
+          <div className="quest-complete-text">내일 새로운 문제가 도착해요.</div>
           <button className="continue-button" onClick={onContinue}>
             Continue
           </button>
@@ -56,6 +69,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
   return (
     <div className="app">
       <div className="logo">SoundNative</div>
+      {streakBadge}
       <h1 className="headline">Sound like a native</h1>
 
       <div className="quest-card">
@@ -100,7 +114,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
           <div className="result">
             <div className="result-status">Correct!</div>
             <div className="result-explanation">{quest.explanation}</div>
-            <button className="continue-button" onClick={handleNext}>
+            <button className="continue-button" onClick={onContinue}>
               Continue
             </button>
           </div>
