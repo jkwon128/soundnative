@@ -13,7 +13,11 @@ const quest = {
     '"You all set?" means "are you ready to check out?" — it\'s not about your health.',
 }
 
-function QuestScreen() {
+interface QuestScreenProps {
+  onContinue: () => void
+}
+
+function QuestScreen({ onContinue }: QuestScreenProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const selectedAnswer = quest.answers.find((a) => a.id === selectedId)
@@ -58,10 +62,7 @@ function QuestScreen() {
               {selectedAnswer.correct ? 'Correct!' : 'Not quite.'}
             </div>
             <div className="result-explanation">{quest.explanation}</div>
-            <button
-              className="continue-button"
-              onClick={() => setSelectedId(null)}
-            >
+            <button className="continue-button" onClick={onContinue}>
               Continue
             </button>
           </div>

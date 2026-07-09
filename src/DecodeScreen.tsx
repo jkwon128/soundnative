@@ -8,7 +8,11 @@ interface DecodeResult {
   howToRespond: string
 }
 
-function DecodeScreen() {
+interface DecodeScreenProps {
+  onBack: () => void
+}
+
+function DecodeScreen({ onBack }: DecodeScreenProps) {
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -44,6 +48,10 @@ function DecodeScreen() {
 
   return (
     <div className="decode-app">
+      <button className="decode-back-button" onClick={onBack}>
+        ← Quest로 돌아가기
+      </button>
+
       <h1 className="decode-title">Decode</h1>
       <p className="decode-subtitle">원어민이 한 말의 진짜 속뜻을 알려드려요</p>
 

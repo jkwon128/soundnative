@@ -6,6 +6,17 @@
   color: #111;
 }
 
+.decode-back-button {
+  display: block;
+  margin: 0 0 20px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .decode-title {
   font-size: 28px;
   margin: 0 0 8px;
