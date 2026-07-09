@@ -90,10 +90,15 @@
   color: #7f1d1d;
 }
 
-.quest-hint-retry {
-  margin-top: 4px;
-  color: #888;
+.quest-retry-button {
+  margin-top: 12px;
+  padding: 10px 16px;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
 }
 
 .result {

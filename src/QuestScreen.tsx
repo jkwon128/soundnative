@@ -32,6 +32,10 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
     }
   }
 
+  const handleRetry = () => {
+    setWrongIds([])
+  }
+
   return (
     <div className="app">
       <div className="logo">SoundNative</div>
@@ -68,7 +72,9 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
         {!correct && wrongIds.length > 0 && (
           <div className="quest-hint">
             <div className="quest-hint-text">{quest.hint}</div>
-            <div className="quest-hint-retry">다시 시도해보세요.</div>
+            <button className="quest-retry-button" onClick={handleRetry}>
+              다시 시도
+            </button>
           </div>
         )}
 
