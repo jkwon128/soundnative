@@ -80,6 +80,22 @@
   color: #888;
 }
 
+.quest-hint {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.quest-hint-text {
+  color: #7f1d1d;
+}
+
+.quest-hint-retry {
+  margin-top: 4px;
+  color: #888;
+  font-size: 14px;
+}
+
 .result {
   margin-top: 24px;
   padding-top: 18px;

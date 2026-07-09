@@ -9,6 +9,7 @@ const quest = {
     { id: 'b', text: 'Are you ready to check out?', correct: true },
     { id: 'c', text: 'Is it sold out?', correct: false },
   ],
+  hint: '다시 생각해보세요 — 계산대에서 자주 쓰는 표현이에요.',
   explanation:
     '"You all set?" means "are you ready to check out?" — it\'s not about your health.',
 }
@@ -18,9 +19,18 @@ interface QuestScreenProps {
 }
 
 function QuestScreen({ onContinue }: QuestScreenProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [wrongIds, setWrongIds] = useState<string[]>([])
+  const [correct, setCorrect] = useState(false)
 
-  const selectedAnswer = quest.answers.find((a) => a.id === selectedId)
+  const handleSelect = (answer: (typeof quest.answers)[number]) => {
+    if (correct || wrongIds.includes(answer.id)) return
+
+    if (answer.correct) {
+      setCorrect(true)
+    } else {
+      setWrongIds((prev) => [...prev, answer.id])
+    }
+  }
 
   return (
     <div className="app">
@@ -33,22 +43,21 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
 
         <div className="answers">
           {quest.answers.map((answer) => {
+            const isWrongPick = wrongIds.includes(answer.id)
+
             let stateClass = ''
-            if (selectedAnswer) {
-              if (answer.correct) {
-                stateClass = 'correct'
-              } else if (answer.id === selectedId) {
-                stateClass = 'incorrect'
-              } else {
-                stateClass = 'muted'
-              }
+            if (correct) {
+              stateClass = answer.correct ? 'correct' : isWrongPick ? 'incorrect' : 'muted'
+            } else if (isWrongPick) {
+              stateClass = 'incorrect'
             }
+
             return (
               <button
                 key={answer.id}
                 className={`answer-button ${stateClass}`.trim()}
-                disabled={selectedAnswer !== undefined}
-                onClick={() => setSelectedId(answer.id)}
+                disabled={correct || isWrongPick}
+                onClick={() => handleSelect(answer)}
               >
                 {answer.text}
               </button>
@@ -56,11 +65,16 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
           })}
         </div>
 
-        {selectedAnswer && (
+        {!correct && wrongIds.length > 0 && (
+          <div className="quest-hint">
+            <div className="quest-hint-text">{quest.hint}</div>
+            <div className="quest-hint-retry">다시 시도해보세요.</div>
+          </div>
+        )}
+
+        {correct && (
           <div className="result">
-            <div className="result-status">
-              {selectedAnswer.correct ? 'Correct!' : 'Not quite.'}
-            </div>
+            <div className="result-status">Correct!</div>
             <div className="result-explanation">{quest.explanation}</div>
             <button className="continue-button" onClick={onContinue}>
               Continue
