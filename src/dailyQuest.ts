@@ -1,5 +1,6 @@
 const STREAK_KEY = 'soundnative_streak'
 const LAST_PLAYED_KEY = 'soundnative_lastPlayedDate'
+const QUESTION_INDEX_OVERRIDE_KEY = 'soundnative_devQuestionIndexOverride'
 
 export interface StreakState {
   streak: number
@@ -63,4 +64,41 @@ export function clearStreak(): void {
   } catch {
     // localStorage unavailable (e.g. private browsing) — ignore
   }
+}
+
+// Dev-only override so the question shown can be forced without waiting
+// for the real date to change. Not written to by normal app logic.
+export function getQuestionIndexOverride(): number | null {
+  try {
+    const raw = localStorage.getItem(QUESTION_INDEX_OVERRIDE_KEY)
+    if (raw === null) return null
+    const value = Number(raw)
+    return Number.isFinite(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+export function setQuestionIndexOverride(index: number): void {
+  try {
+    localStorage.setItem(QUESTION_INDEX_OVERRIDE_KEY, String(index))
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}
+
+export function clearQuestionIndexOverride(): void {
+  try {
+    localStorage.removeItem(QUESTION_INDEX_OVERRIDE_KEY)
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}
+
+export function getCurrentQuestionIndex(totalQuestions: number): number {
+  const override = getQuestionIndexOverride()
+  if (override !== null) {
+    return ((override % totalQuestions) + totalQuestions) % totalQuestions
+  }
+  return getDayIndex(getTodayDateString()) % totalQuestions
 }

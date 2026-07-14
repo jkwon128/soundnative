@@ -3,7 +3,7 @@ import './App.css'
 import { quizQuestions } from './quizData'
 import {
   computeNextStreak,
-  getDayIndex,
+  getCurrentQuestionIndex,
   getTodayDateString,
   loadStreak,
   saveStreak,
@@ -16,7 +16,7 @@ interface QuestScreenProps {
 
 function QuestScreen({ onContinue }: QuestScreenProps) {
   const today = getTodayDateString()
-  const questionIndex = getDayIndex(today) % quizQuestions.length
+  const questionIndex = getCurrentQuestionIndex(quizQuestions.length)
   const quest = quizQuestions[questionIndex]
 
   const [streakState, setStreakState] = useState<StreakState>(() => loadStreak())
