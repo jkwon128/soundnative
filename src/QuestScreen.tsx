@@ -48,7 +48,13 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
     setWrongChoices([])
   }
 
-  const streakBadge = <div className="streak-badge">🔥 {streakState.streak}일 연속</div>
+  const streakBadge = (
+    <div className="streak-hero">
+      <span className="streak-hero-fire">🔥</span>
+      <span className="streak-hero-value">{streakState.streak}</span>
+      <span className="streak-hero-unit">일 연속</span>
+    </div>
+  )
 
   if (alreadySolvedToday) {
     return (

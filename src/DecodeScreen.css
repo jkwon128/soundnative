@@ -1,90 +1,121 @@
 .decode-app {
-  max-width: 480px;
+  max-width: var(--app-max-width);
   margin: 0 auto;
-  padding: 40px 20px;
-  font-family: sans-serif;
-  color: #111;
+  padding: 40px 20px 56px;
+  font-family: inherit;
+  color: var(--color-text-primary);
 }
 
 .decode-back-button {
-  display: block;
+  display: inline-flex;
+  align-items: center;
   margin: 0 0 20px;
   padding: 6px 0;
   border: none;
   background: none;
-  color: #666;
+  font-family: inherit;
+  color: var(--color-brand);
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .decode-title {
-  font-size: 28px;
+  font-size: 26px;
+  font-weight: 800;
   margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
 .decode-subtitle {
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0 0 24px;
 }
 
 .decode-input {
   width: 100%;
-  min-height: 80px;
-  padding: 12px;
-  font-size: 16px;
+  min-height: 88px;
+  padding: 14px;
+  font-size: 15px;
   font-family: inherit;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   box-sizing: border-box;
   resize: vertical;
 }
 
+.decode-input:focus {
+  outline: none;
+  border-color: var(--color-brand);
+}
+
 .decode-button {
+  width: 100%;
   margin-top: 12px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   font-size: 16px;
+  font-family: inherit;
+  font-weight: 700;
   border: none;
-  border-radius: 6px;
-  background: #222;
-  color: #fff;
+  border-radius: var(--radius-button);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
   cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease;
+}
+
+.decode-button:hover:not(:disabled) {
+  background: var(--color-brand-dark);
 }
 
 .decode-button:disabled {
-  background: #999;
+  background: var(--color-muted-text);
   cursor: default;
 }
 
 .decode-status {
   margin-top: 16px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .decode-error {
   margin-top: 16px;
-  color: #c62828;
+  padding: 12px 14px;
+  border-radius: var(--radius-input);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error-text);
 }
 
 .decode-result {
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .decode-field {
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   padding: 16px;
 }
 
 .decode-field-label {
-  font-size: 13px;
-  font-weight: bold;
-  color: #666;
-  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-label);
+  margin-bottom: 8px;
 }
 
 .decode-field-value {
-  color: #111;
+  color: var(--color-text-primary);
+  line-height: 1.5;
 }

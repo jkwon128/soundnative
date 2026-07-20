@@ -1,64 +1,70 @@
 .onboarding-section {
   text-align: left;
-  margin-bottom: 28px;
+  margin-bottom: var(--space-lg);
 }
 
 .onboarding-section-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-label);
+  margin-bottom: var(--space-sm);
 }
 
 .onboarding-level-list {
   display: flex;
-  gap: 8px;
+  gap: var(--space-xs);
 }
 
 .onboarding-level-button {
   flex: 1;
   padding: 12px 8px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  color: #111;
+  font-family: inherit;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .onboarding-level-button.selected {
-  border-color: #222;
-  background: #222;
-  color: #fff;
-  font-weight: bold;
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
 }
 
 .onboarding-chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-xs);
 }
 
 .onboarding-chip {
-  padding: 10px 14px;
+  padding: 10px 16px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  background: #fff;
-  color: #111;
+  font-family: inherit;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .onboarding-chip.selected {
-  border-color: #222;
-  background: #222;
-  color: #fff;
-  font-weight: bold;
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
 }
 
 .onboarding-hint {
   font-size: 12px;
-  color: #888;
-  margin-top: -4px;
-  margin-bottom: 28px;
+  color: var(--color-text-secondary);
+  margin-top: -8px;
+  margin-bottom: var(--space-lg);
 }
