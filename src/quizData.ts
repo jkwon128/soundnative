@@ -474,4 +474,76 @@ export const quizQuestions: QuizQuestion[] = [
       '악보 없이 귀로 듣고 즉흥 연주하는 데서 온 관용구로, "미리 계획하지 말고 상황 봐서 하자"는 뜻입니다. 확정된 약속이 아니라는 게 핵심이에요. 기대하고 기다리면 안 됩니다.',
     category: 'smalltalk',
   },
+  // SoundNative — 추가 문제 4개
+// doctor 1개 / school 2개 / rent 1개
+//
+// 목적: 각 카테고리를 3의 배수로 맞춰 세션에서 버려지는 문제를 없앰
+//   doctor 5 → 6 (2세션)
+//   school 4 → 6 (2세션)
+//   rent   5 → 6 (2세션)
+//   총 32 → 36문제, 9세션 → 12세션
+//
+// 사용법: quizData.ts의 배열 맨 끝(닫는 ] 앞)에 붙여넣기
+
+  // ── 추가: DOCTOR ──
+  {
+    situation: '진료비 안내를 받는데 직원이',
+    phrase: "That's going to be out of pocket.",
+    choices: [
+      '보험사에서 직접 청구할 예정입니다.',
+      '보험이 적용되지 않아 전액 본인 부담입니다.',
+      '나중에 환급받으실 수 있습니다.',
+    ],
+    answer: 1,
+    hint: "다시 생각해보세요 — 'pocket'이 나왔지만 실제 주머니 이야기가 아니에요. 누구의 돈일까요?",
+    explanation:
+      "'out of pocket'은 보험이 커버하지 않아 내 돈으로 직접 내야 한다는 뜻입니다. 미국 병원에서 가장 중요한 표현 중 하나예요. 이 말이 나오면 \"How much will that be?\"로 금액을 먼저 확인하세요.",
+    category: 'doctor',
+  },
+
+  // ── 추가: SCHOOL ──
+  {
+    situation: '수업 중 질문했더니 교수님이',
+    phrase: "That's a good question.",
+    choices: [
+      '정말 훌륭한 질문이라는 칭찬입니다.',
+      '수업과 관련 없는 질문이라는 뜻입니다.',
+      '답을 고를 시간을 버는 말이기도 합니다.',
+    ],
+    answer: 2,
+    hint: '다시 생각해보세요 — 이 말 다음에 바로 명쾌한 답이 나오던가요?',
+    explanation:
+      '진짜 칭찬일 때도 있지만, 답을 모르거나 어떻게 설명할지 고민할 때 시간을 버는 완충 표현으로도 자주 씁니다. 뒤에 "Let me think about that."이나 "I\'ll get back to you."가 따라오면 후자예요.',
+    category: 'school',
+  },
+  {
+    situation: '조별과제 회의에서 팀원이',
+    phrase: "I'll take a stab at it.",
+    choices: [
+      '내가 한번 시도해볼게.',
+      '나는 그 부분을 맡지 않을게.',
+      '내가 검토만 해줄게.',
+    ],
+    answer: 0,
+    hint: '다시 생각해보세요 — 이 사람은 일을 맡겠다는 걸까요, 빠지겠다는 걸까요?',
+    explanation:
+      "'take a stab at'은 '한번 해보다'라는 뜻의 관용구입니다. 완벽하진 않아도 초안을 만들어보겠다는 뉘앙스예요. 맡겠다는 뜻이니 \"That'd be great, thanks!\"로 받으면 됩니다.",
+    category: 'school',
+  },
+
+  // ── 추가: RENT ──
+  {
+    situation: '집을 보러 갔더니 부동산 중개인이',
+    phrase: "It's got good bones.",
+    choices: [
+      '최근에 전부 새로 고쳤다는 뜻입니다.',
+      '인테리어가 고급스럽다는 뜻입니다.',
+      '낡았지만 구조는 튼튼하다는 뜻입니다.',
+    ],
+    answer: 2,
+    hint: "다시 생각해보세요 — 집을 칭찬하는 말입니다. 그런데 왜 하필 '뼈대'만 칭찬했을까요?",
+    explanation:
+      '기본 골격과 구조는 좋다는 칭찬이지만, 뒤집으면 마감·설비·인테리어는 손볼 데가 많다는 뜻입니다. 부동산 광고에서 아주 흔한 완곡어법이에요. 이 말이 나오면 수리 상태를 특히 꼼꼼히 확인하세요.',
+    category: 'rent',
+  },
 ]
