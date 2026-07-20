@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "pages:dev": "wrangler pages dev -- npm run dev",
-    "pages:preview": "npm run build && wrangler pages dev dist"
+    "pages:dev": "wrangler pages dev --compatibility-date=2026-07-13 -- npm run dev",
+    "pages:preview": "npm run build && wrangler pages dev dist --compatibility-date=2026-07-13"
   },
   "dependencies": {
     "react": "^19.2.7",
