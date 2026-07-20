@@ -9,6 +9,7 @@ import {
   saveStreak,
   type StreakState,
 } from './dailyQuest'
+import { getActiveQuestions } from './questSelection'
 
 interface QuestScreenProps {
   onContinue: () => void
@@ -16,8 +17,9 @@ interface QuestScreenProps {
 
 function QuestScreen({ onContinue }: QuestScreenProps) {
   const today = getTodayDateString()
-  const questionIndex = getCurrentQuestionIndex(quizQuestions.length)
-  const quest = quizQuestions[questionIndex]
+  const activeQuestions = getActiveQuestions(quizQuestions)
+  const questionIndex = getCurrentQuestionIndex(activeQuestions.length)
+  const quest = activeQuestions[questionIndex]
 
   const [streakState, setStreakState] = useState<StreakState>(() => loadStreak())
   const [alreadySolvedToday] = useState(() => streakState.lastPlayedDate === today)
@@ -25,7 +27,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
   const [correct, setCorrect] = useState(false)
 
   const handleSelect = (choiceIndex: number) => {
-    if (correct || wrongChoices.includes(choiceIndex)) return
+    if (correct || wrongChoices.length > 0) return
 
     if (choiceIndex === quest.answer) {
       setCorrect(true)
@@ -92,7 +94,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
               <button
                 key={index}
                 className={`answer-button ${stateClass}`.trim()}
-                disabled={correct || isWrongPick}
+                disabled={correct || wrongChoices.length > 0}
                 onClick={() => handleSelect(index)}
               >
                 {choice}

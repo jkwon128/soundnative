@@ -12,6 +12,12 @@ import {
   saveStreak,
   setQuestionIndexOverride,
 } from './dailyQuest'
+import { SITUATION_CHIPS, loadOnboardingSituations } from './situations'
+import {
+  filterQuestionsByCategories,
+  getDevIgnoreSituationFilter,
+  setDevIgnoreSituationFilter,
+} from './questSelection'
 
 interface DevPanelProps {
   onStateChange: () => void
@@ -22,7 +28,14 @@ function DevPanel({ onStateChange }: DevPanelProps) {
 
   const current = loadStreak()
   const today = getTodayDateString()
-  const currentQuestionIndex = getCurrentQuestionIndex(quizQuestions.length)
+  const selectedSituations = loadOnboardingSituations()
+  const selectedSituationLabels = SITUATION_CHIPS.filter((chip) =>
+    selectedSituations.includes(chip.category),
+  ).map((chip) => chip.label)
+  const ignoreSituationFilter = getDevIgnoreSituationFilter()
+  const candidateQuestions = filterQuestionsByCategories(quizQuestions, selectedSituations)
+  const activeQuestions = ignoreSituationFilter ? quizQuestions : candidateQuestions
+  const currentQuestionIndex = getCurrentQuestionIndex(activeQuestions.length)
   const solvedToday = current.lastPlayedDate === today
 
   // Rolling lastPlayedDate back to "yesterday" (keeping the streak number)
@@ -51,7 +64,12 @@ function DevPanel({ onStateChange }: DevPanelProps) {
   }
 
   const handleNextQuestion = () => {
-    setQuestionIndexOverride((currentQuestionIndex + 1) % quizQuestions.length)
+    setQuestionIndexOverride((currentQuestionIndex + 1) % activeQuestions.length)
+    onStateChange()
+  }
+
+  const handleToggleIgnoreSituationFilter = () => {
+    setDevIgnoreSituationFilter(!ignoreSituationFilter)
     onStateChange()
   }
 
@@ -74,9 +92,24 @@ function DevPanel({ onStateChange }: DevPanelProps) {
             <div>마지막 완료일: {current.lastPlayedDate ?? '없음'}</div>
             <div>오늘 완료 여부: {solvedToday ? '완료' : '미완료'}</div>
             <div>
-              문제 인덱스: {currentQuestionIndex} / {quizQuestions.length - 1}
+              문제: {currentQuestionIndex + 1}번째 / 총 {activeQuestions.length}개
+            </div>
+            <div>
+              후보 {candidateQuestions.length}개 / 전체 {quizQuestions.length}개
+            </div>
+            <div>
+              선택된 상황:{' '}
+              {selectedSituationLabels.length > 0 ? selectedSituationLabels.join(', ') : '없음 (전체 사용)'}
             </div>
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <input
+              type="checkbox"
+              checked={ignoreSituationFilter}
+              onChange={handleToggleIgnoreSituationFilter}
+            />
+            상황 필터 무시하고 전체 보기
+          </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <button onClick={rollLastPlayedToYesterday}>오늘 기록 리셋</button>
             <button onClick={handleFullReset}>전체 리셋</button>

@@ -1,0 +1,64 @@
+.onboarding-section {
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.onboarding-section-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.onboarding-level-list {
+  display: flex;
+  gap: 8px;
+}
+
+.onboarding-level-button {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+.onboarding-level-button.selected {
+  border-color: #222;
+  background: #222;
+  color: #fff;
+  font-weight: bold;
+}
+
+.onboarding-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.onboarding-chip {
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+.onboarding-chip.selected {
+  border-color: #222;
+  background: #222;
+  color: #fff;
+  font-weight: bold;
+}
+
+.onboarding-hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: -4px;
+  margin-bottom: 28px;
+}
