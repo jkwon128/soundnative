@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import './App.css'
-import { quizQuestions } from './quizData'
 import {
   computeNextStreak,
   getCurrentQuestionIndex,
@@ -9,7 +8,7 @@ import {
   saveStreak,
   type StreakState,
 } from './dailyQuest'
-import { getActiveQuestions } from './questSelection'
+import { getActiveSessions } from './questSessions'
 
 interface QuestScreenProps {
   onContinue: () => void
@@ -17,20 +16,44 @@ interface QuestScreenProps {
 
 function QuestScreen({ onContinue }: QuestScreenProps) {
   const today = getTodayDateString()
-  const activeQuestions = getActiveQuestions(quizQuestions)
-  const questionIndex = getCurrentQuestionIndex(activeQuestions.length)
-  const quest = activeQuestions[questionIndex]
+  const activeSessions = getActiveSessions()
+  const sessionIndex = getCurrentQuestionIndex(activeSessions.length)
+  const session = activeSessions[sessionIndex]
 
   const [streakState, setStreakState] = useState<StreakState>(() => loadStreak())
-  const [alreadySolvedToday] = useState(() => streakState.lastPlayedDate === today)
+  const [alreadyCompletedToday] = useState(() => streakState.lastPlayedDate === today)
+
+  // Progress through today's session lives only in component state — it is
+  // never persisted, so leaving mid-session and coming back starts over.
+  // Modeled as a step index rather than a hardcoded "3 questions" so a
+  // future step type (e.g. a non-quiz "depth card") can slot in without
+  // restructuring this flow.
+  const [stepIndex, setStepIndex] = useState(0)
   const [wrongChoices, setWrongChoices] = useState<number[]>([])
   const [correct, setCorrect] = useState(false)
+  const [sessionComplete, setSessionComplete] = useState(false)
+
+  const totalSteps = session.questions.length
+  const isLastStep = stepIndex === totalSteps - 1
+  const question = session.questions[stepIndex]
 
   const handleSelect = (choiceIndex: number) => {
     if (correct || wrongChoices.length > 0) return
 
-    if (choiceIndex === quest.answer) {
+    if (choiceIndex === question.answer) {
       setCorrect(true)
+    } else {
+      setWrongChoices((prev) => [...prev, choiceIndex])
+    }
+  }
+
+  const handleRetry = () => {
+    setWrongChoices([])
+  }
+
+  const handleAdvance = () => {
+    if (isLastStep) {
+      // Streak only advances once every step in the session is done.
       setStreakState((prev) => {
         const next: StreakState = {
           streak: computeNextStreak(prev, today),
@@ -39,13 +62,13 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
         saveStreak(next)
         return next
       })
-    } else {
-      setWrongChoices((prev) => [...prev, choiceIndex])
+      setSessionComplete(true)
+      return
     }
-  }
 
-  const handleRetry = () => {
+    setStepIndex((i) => i + 1)
     setWrongChoices([])
+    setCorrect(false)
   }
 
   const streakBadge = (
@@ -56,7 +79,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
     </div>
   )
 
-  if (alreadySolvedToday) {
+  if (alreadyCompletedToday || sessionComplete) {
     return (
       <div className="app">
         <div className="logo">SoundNative</div>
@@ -64,10 +87,20 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
         <h1 className="headline">Sound like a native</h1>
 
         <div className="quest-card">
-          <div className="quest-complete-title">오늘의 퀘스트는 완료했어요!</div>
-          <div className="quest-complete-text">내일 새로운 문제가 도착해요.</div>
+          <div className="quest-complete-title">오늘의 세션 완료!</div>
+          <div className="quest-complete-text">내일 새로운 세션이 도착해요.</div>
+
+          <div className="session-summary-list">
+            {session.questions.map((sessionQuestion, index) => (
+              <div className="session-summary-item" key={index}>
+                <div className="session-summary-phrase">"{sessionQuestion.phrase}"</div>
+                <div className="session-summary-note">{sessionQuestion.explanation}</div>
+              </div>
+            ))}
+          </div>
+
           <button className="continue-button" onClick={onContinue}>
-            Continue
+            Decode 도구 열기
           </button>
         </div>
       </div>
@@ -81,13 +114,16 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
       <h1 className="headline">Sound like a native</h1>
 
       <div className="quest-card">
-        <div className="quest-label">{quest.situation}</div>
-        <div className="quest-phrase">"{quest.phrase}"</div>
+        <div className="quest-progress">
+          {stepIndex + 1} / {totalSteps}
+        </div>
+        <div className="quest-label">{question.situation}</div>
+        <div className="quest-phrase">"{question.phrase}"</div>
 
         <div className="answers">
-          {quest.choices.map((choice, index) => {
+          {question.choices.map((choice, index) => {
             const isWrongPick = wrongChoices.includes(index)
-            const isCorrectChoice = index === quest.answer
+            const isCorrectChoice = index === question.answer
 
             let stateClass = ''
             if (correct) {
@@ -111,7 +147,7 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
 
         {!correct && wrongChoices.length > 0 && (
           <div className="quest-hint">
-            <div className="quest-hint-text">{quest.hint}</div>
+            <div className="quest-hint-text">{question.hint}</div>
             <button className="quest-retry-button" onClick={handleRetry}>
               다시 시도
             </button>
@@ -121,9 +157,9 @@ function QuestScreen({ onContinue }: QuestScreenProps) {
         {correct && (
           <div className="result">
             <div className="result-status">Correct!</div>
-            <div className="result-explanation">{quest.explanation}</div>
-            <button className="continue-button" onClick={onContinue}>
-              Continue
+            <div className="result-explanation">{question.explanation}</div>
+            <button className="continue-button" onClick={handleAdvance}>
+              {isLastStep ? 'Continue' : '다음'}
             </button>
           </div>
         )}

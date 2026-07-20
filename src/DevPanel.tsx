@@ -1,7 +1,6 @@
 // TEMPORARY dev-only tool for testing the daily quest / streak logic.
 // Remove this file and its usage in App.tsx when no longer needed.
 import { useState } from 'react'
-import { quizQuestions } from './quizData'
 import {
   clearQuestionIndexOverride,
   clearStreak,
@@ -13,11 +12,8 @@ import {
   setQuestionIndexOverride,
 } from './dailyQuest'
 import { SITUATION_CHIPS, loadOnboardingSituations } from './situations'
-import {
-  filterQuestionsByCategories,
-  getDevIgnoreSituationFilter,
-  setDevIgnoreSituationFilter,
-} from './questSelection'
+import { getDevIgnoreSituationFilter, setDevIgnoreSituationFilter } from './questSelection'
+import { ALL_SESSIONS, filterSessionsByCategories } from './questSessions'
 
 interface DevPanelProps {
   onStateChange: () => void
@@ -33,9 +29,13 @@ function DevPanel({ onStateChange }: DevPanelProps) {
     selectedSituations.includes(chip.category),
   ).map((chip) => chip.label)
   const ignoreSituationFilter = getDevIgnoreSituationFilter()
-  const candidateQuestions = filterQuestionsByCategories(quizQuestions, selectedSituations)
-  const activeQuestions = ignoreSituationFilter ? quizQuestions : candidateQuestions
-  const currentQuestionIndex = getCurrentQuestionIndex(activeQuestions.length)
+  const candidateSessions = filterSessionsByCategories(ALL_SESSIONS, selectedSituations)
+  const activeSessions = ignoreSituationFilter ? ALL_SESSIONS : candidateSessions
+  const currentSessionIndex = getCurrentQuestionIndex(activeSessions.length)
+  const currentSession = activeSessions[currentSessionIndex]
+  const currentSessionCategoryLabel =
+    SITUATION_CHIPS.find((chip) => chip.category === currentSession.category)?.label ??
+    currentSession.category
   const solvedToday = current.lastPlayedDate === today
 
   // Rolling lastPlayedDate back to "yesterday" (keeping the streak number)
@@ -63,8 +63,15 @@ function DevPanel({ onStateChange }: DevPanelProps) {
     onStateChange()
   }
 
-  const handleNextQuestion = () => {
-    setQuestionIndexOverride((currentQuestionIndex + 1) % activeQuestions.length)
+  const handleNextSession = () => {
+    setQuestionIndexOverride((currentSessionIndex + 1) % activeSessions.length)
+    onStateChange()
+  }
+
+  // Session progress lives only in QuestScreen's component state, so simply
+  // forcing a remount (same mechanism every other button here uses) resets
+  // it back to step 1 without touching which session is active.
+  const handleRestartSession = () => {
     onStateChange()
   }
 
@@ -79,7 +86,7 @@ function DevPanel({ onStateChange }: DevPanelProps) {
         <div
           style={{
             marginBottom: 8,
-            width: 260,
+            width: 280,
             background: '#111',
             color: '#fff',
             fontSize: 12,
@@ -92,15 +99,23 @@ function DevPanel({ onStateChange }: DevPanelProps) {
             <div>마지막 완료일: {current.lastPlayedDate ?? '없음'}</div>
             <div>오늘 완료 여부: {solvedToday ? '완료' : '미완료'}</div>
             <div>
-              문제: {currentQuestionIndex + 1}번째 / 총 {activeQuestions.length}개
+              세션: {currentSessionIndex + 1}번째 / 총 {activeSessions.length}개
             </div>
             <div>
-              후보 {candidateQuestions.length}개 / 전체 {quizQuestions.length}개
+              후보 세션 {candidateSessions.length}개 / 전체 세션 {ALL_SESSIONS.length}개
             </div>
             <div>
               선택된 상황:{' '}
               {selectedSituationLabels.length > 0 ? selectedSituationLabels.join(', ') : '없음 (전체 사용)'}
             </div>
+          </div>
+          <div style={{ marginBottom: 8, lineHeight: 1.6, borderTop: '1px solid #333', paddingTop: 8 }}>
+            <div>현재 세션 category: {currentSessionCategoryLabel}</div>
+            {currentSession.questions.map((q, index) => (
+              <div key={index} style={{ color: '#aaa' }}>
+                {index + 1}. {q.phrase}
+              </div>
+            ))}
           </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
             <input
@@ -116,7 +131,8 @@ function DevPanel({ onStateChange }: DevPanelProps) {
             <button onClick={rollLastPlayedToYesterday}>어제 푼 것처럼</button>
             <button onClick={handleIncrementStreak}>스트릭 +1</button>
             <button onClick={handleResetStreakNumber}>스트릭 리셋</button>
-            <button onClick={handleNextQuestion}>다음 문제 보기</button>
+            <button onClick={handleNextSession}>다음 세션 보기</button>
+            <button onClick={handleRestartSession}>세션 처음부터</button>
           </div>
         </div>
       )}

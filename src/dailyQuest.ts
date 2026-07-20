@@ -66,8 +66,9 @@ export function clearStreak(): void {
   }
 }
 
-// Dev-only override so the question shown can be forced without waiting
-// for the real date to change. Not written to by normal app logic.
+// Dev-only override so the day-indexed item shown (a session, previously a
+// single question) can be forced without waiting for the real date to
+// change. Not written to by normal app logic.
 export function getQuestionIndexOverride(): number | null {
   try {
     const raw = localStorage.getItem(QUESTION_INDEX_OVERRIDE_KEY)

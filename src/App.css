@@ -69,6 +69,17 @@
   margin-bottom: 8px;
 }
 
+/* Same small-caps label treatment as .quest-label, used for the "1 / 3"
+   session step indicator that sits above it. */
+.quest-progress {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-label);
+  margin-bottom: 4px;
+}
+
 .quest-phrase {
   font-size: 22px;
   font-weight: 800;
@@ -133,6 +144,35 @@
 .quest-complete-text {
   color: var(--color-text-secondary);
   margin-bottom: 20px;
+}
+
+.session-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Same card treatment as .decode-field (surface + border + card radius +
+   shadow), reused here for each learned phrase in the session recap. */
+.session-summary-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+}
+
+.session-summary-phrase {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.session-summary-note {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .quest-hint {
