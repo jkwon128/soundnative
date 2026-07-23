@@ -1,5 +1,20 @@
+import { useState } from 'react'
+import WelcomeScreen from './WelcomeScreen'
+import TeaserQuiz from './TeaserQuiz'
+import PlaceholderScreen from './PlaceholderScreen'
+
+type Screen = 'welcome' | 'teaserQuiz' | 'placeholder'
+
 function App() {
-  return <div style={{ width: '100vw', height: '100vh' }} />
+  const [screen, setScreen] = useState<Screen>('welcome')
+
+  return (
+    <>
+      {screen === 'welcome' && <WelcomeScreen onStart={() => setScreen('teaserQuiz')} />}
+      {screen === 'teaserQuiz' && <TeaserQuiz onComplete={() => setScreen('placeholder')} />}
+      {screen === 'placeholder' && <PlaceholderScreen />}
+    </>
+  )
 }
 
 export default App
