@@ -1,0 +1,167 @@
+.home-screen {
+  min-height: 100vh;
+  background: #fafafa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.home-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.home-logo {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.home-topbar-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.home-stat {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.home-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 60px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 32px 120px;
+}
+
+.home-path {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-path::before {
+  content: '';
+  position: absolute;
+  top: 32px;
+  bottom: 32px;
+  left: 50%;
+  width: 4px;
+  background: #e0e0e0;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.home-path-node-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.home-path-node {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #ddd;
+  background: #ececec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+}
+
+.home-path-node-completed,
+.home-path-node-today {
+  color: #fff;
+}
+
+.home-path-node-future {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.home-path-node-today {
+  animation: home-path-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes home-path-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(26, 115, 232, 0);
+  }
+}
+
+.home-path-node-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2e9e4f;
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+}
+
+.home-path-node-label {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+}
+
+.home-decode-card {
+  position: sticky;
+  top: 96px;
+  width: 240px;
+  flex-shrink: 0;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.home-decode-question {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 14px;
+}
+
+.home-decode-button {
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+}

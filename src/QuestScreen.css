@@ -1,0 +1,117 @@
+.quest-screen {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.quest-back-button {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 24px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: #1a73e8;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quest-progress {
+  font-size: 14px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.quest-situation {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.quest-phrase {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 28px;
+}
+
+.quest-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quest-choice {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  text-align: left;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.quest-choice:hover:not(:disabled) {
+  border-color: #1a73e8;
+}
+
+.quest-choice:disabled {
+  cursor: default;
+}
+
+.quest-choice-correct {
+  border-color: #2e9e4f;
+  background: #eafaf0;
+  color: #1e7a38;
+}
+
+.quest-choice-incorrect {
+  border-color: #d93025;
+  background: #fdecea;
+  color: #a3241a;
+}
+
+.quest-feedback {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+.quest-feedback-correct {
+  background: #eafaf0;
+  border: 1px solid #b7e6c4;
+  color: #1e7a38;
+}
+
+.quest-feedback-incorrect {
+  background: #fdecea;
+  border: 1px solid #f3c1bd;
+  color: #a3241a;
+}
+
+.quest-feedback-label {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.quest-action-button {
+  display: block;
+  margin-top: 16px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+}

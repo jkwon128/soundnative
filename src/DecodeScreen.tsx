@@ -49,7 +49,7 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
   return (
     <div className="decode-app">
       <button className="decode-back-button" onClick={onBack}>
-        ← Quest로 돌아가기
+        ← 홈으로
       </button>
 
       <h1 className="decode-title">Decode</h1>

@@ -6,7 +6,10 @@ import LevelScreen from './LevelScreen'
 import FrequencyScreen from './FrequencyScreen'
 import GoalScreen from './GoalScreen'
 import AuthScreen from './AuthScreen'
-import PlaceholderScreen from './PlaceholderScreen'
+import HomeScreen from './HomeScreen'
+import QuestScreen from './QuestScreen'
+import DecodeScreen from './DecodeScreen'
+import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
 type Screen =
@@ -17,7 +20,9 @@ type Screen =
   | 'frequency'
   | 'goal'
   | 'auth'
-  | 'placeholder'
+  | 'home'
+  | 'quest'
+  | 'decode'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
@@ -28,6 +33,7 @@ function App() {
   const [englishLevel, setEnglishLevel] = useState<EnglishLevel | null>(null)
   const [visitFrequency, setVisitFrequency] = useState<VisitFrequency | null>(null)
   const [learningGoal, setLearningGoal] = useState<LearningGoal | null>(null)
+  const [activeSession, setActiveSession] = useState<QuestSession | null>(null)
 
   useEffect(() => {
     if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency || learningGoal)) {
@@ -80,8 +86,20 @@ function App() {
           }}
         />
       )}
-      {screen === 'auth' && <AuthScreen onContinue={() => setScreen('placeholder')} />}
-      {screen === 'placeholder' && <PlaceholderScreen />}
+      {screen === 'auth' && <AuthScreen onContinue={() => setScreen('home')} />}
+      {screen === 'home' && (
+        <HomeScreen
+          onOpenQuest={(session) => {
+            setActiveSession(session)
+            setScreen('quest')
+          }}
+          onOpenDecode={() => setScreen('decode')}
+        />
+      )}
+      {screen === 'quest' && activeSession && (
+        <QuestScreen session={activeSession} onExit={() => setScreen('home')} />
+      )}
+      {screen === 'decode' && <DecodeScreen onBack={() => setScreen('home')} />}
     </>
   )
 }
