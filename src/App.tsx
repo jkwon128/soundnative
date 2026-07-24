@@ -5,6 +5,7 @@ import StatusScreen from './StatusScreen'
 import LevelScreen from './LevelScreen'
 import FrequencyScreen from './FrequencyScreen'
 import GoalScreen from './GoalScreen'
+import AuthScreen from './AuthScreen'
 import PlaceholderScreen from './PlaceholderScreen'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
@@ -15,6 +16,7 @@ type Screen =
   | 'level'
   | 'frequency'
   | 'goal'
+  | 'auth'
   | 'placeholder'
 
 function App() {
@@ -74,10 +76,11 @@ function App() {
         <GoalScreen
           onNext={(goal) => {
             setLearningGoal(goal)
-            setScreen('placeholder')
+            setScreen('auth')
           }}
         />
       )}
+      {screen === 'auth' && <AuthScreen onContinue={() => setScreen('placeholder')} />}
       {screen === 'placeholder' && <PlaceholderScreen />}
     </>
   )

@@ -1,0 +1,96 @@
+.auth-screen {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.auth-progress {
+  font-size: 14px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.auth-headline {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 28px;
+}
+
+.auth-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.auth-provider-button {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.auth-provider-button:hover {
+  border-color: #1a73e8;
+}
+
+.auth-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.auth-email-input {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.auth-email-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.auth-signup-button {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.auth-skip-button {
+  display: block;
+  margin: 0 auto;
+  padding: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: #888;
+  cursor: pointer;
+  text-decoration: underline;
+}

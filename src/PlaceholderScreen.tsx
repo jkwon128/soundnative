@@ -19,7 +19,7 @@ function PlaceholderScreen() {
         다음 단계 준비 중
       </h1>
       <p style={{ fontSize: 15, color: '#666', margin: 0 }}>
-        로그인/가입 화면이 여기에 들어올 예정이에요.
+        홈 화면이 여기에 들어올 예정이에요.
       </p>
     </div>
   )
