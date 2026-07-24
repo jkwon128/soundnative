@@ -1,3 +1,5 @@
+import Logo from './Logo'
+
 interface WelcomeScreenProps {
   onStart: () => void
 }
@@ -60,9 +62,7 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               </div>
 
               <div className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
-                <span className="material-symbols-outlined text-on-primary text-sm">
-                  volume_up
-                </span>
+                <Logo className="h-4 w-4" />
                 <span className="font-label-bold text-on-primary text-xs">SoundNative</span>
               </div>
             </div>
