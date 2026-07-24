@@ -11,10 +11,7 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         </span>
 
         <div className="flex flex-col items-center text-center gap-sm pt-lg">
-          <div className="flex items-center gap-2 text-primary font-label-bold text-label-bold">
-            <span className="material-symbols-outlined text-2xl">volume_up</span>
-            SoundNative
-          </div>
+          <div className="text-primary font-label-bold text-label-bold">SoundNative</div>
 
           <h1 className="font-display-lg text-display-lg text-on-surface max-w-[420px]">
             Sound like a native, understand the real meaning.
