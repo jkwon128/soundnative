@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { EnglishLevel } from './types'
 import './LevelScreen.css'
 
 const TOTAL_ONBOARDING_STEPS = 6
 const CURRENT_STEP = 2
-const AUTO_ADVANCE_DELAY_MS = 300
 
 interface LevelOption {
   value: EnglishLevel
@@ -23,12 +22,6 @@ interface LevelScreenProps {
 
 function LevelScreen({ onNext }: LevelScreenProps) {
   const [selected, setSelected] = useState<EnglishLevel | null>(null)
-
-  useEffect(() => {
-    if (selected === null) return
-    const timer = setTimeout(() => onNext(selected), AUTO_ADVANCE_DELAY_MS)
-    return () => clearTimeout(timer)
-  }, [selected, onNext])
 
   return (
     <div className="level-screen">
@@ -52,6 +45,14 @@ function LevelScreen({ onNext }: LevelScreenProps) {
           </label>
         ))}
       </div>
+
+      <button
+        className="level-next-button"
+        disabled={selected === null}
+        onClick={() => selected !== null && onNext(selected)}
+      >
+        다음
+      </button>
     </div>
   )
 }
