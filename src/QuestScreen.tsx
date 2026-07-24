@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
+import QuizFeedbackFooter, { type AnswerStatus } from './QuizFeedbackFooter'
 
 function speak(text: string) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
@@ -9,8 +10,6 @@ function speak(text: string) {
   utterance.lang = 'en-US'
   window.speechSynthesis.speak(utterance)
 }
-
-type AnswerStatus = 'unanswered' | 'correct' | 'incorrect'
 
 interface QuestScreenProps {
   session: QuestSession
@@ -135,9 +134,6 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
 
         {status === 'correct' && (
           <div className="bg-secondary-container/20 border border-secondary rounded-xl p-md">
-            <div className="font-label-bold text-label-bold text-on-secondary-container mb-1">
-              정답이에요!
-            </div>
             <p className="font-body-md text-body-md text-on-surface-variant">
               {question.explanation}
             </p>
@@ -146,23 +142,13 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
 
         {status === 'incorrect' && (
           <div className="bg-error-container/40 border border-error rounded-xl p-md">
-            <div className="font-label-bold text-label-bold text-on-error-container mb-1">
-              다시 생각해보세요
-            </div>
+            <div className="font-label-bold text-label-bold text-on-error-container mb-1">힌트</div>
             <p className="font-body-md text-body-md text-on-surface-variant">{question.hint}</p>
           </div>
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant p-gutter md:p-lg flex justify-center">
-        <button
-          className="btn-primary w-full max-w-[640px] bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
-          disabled={status === 'unanswered'}
-          onClick={handleFooterClick}
-        >
-          {status === 'incorrect' ? '다시 시도' : isLastQuestion ? '완료' : '다음'}
-        </button>
-      </div>
+      <QuizFeedbackFooter status={status} isLastQuestion={isLastQuestion} onClick={handleFooterClick} />
     </div>
   )
 }
