@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-on-surface: #161a32;
+  --color-on-primary: #ffffff;
+  --color-tertiary: #50555e;
+  --color-surface-container-high: #e5e6ff;
+  --color-inverse-surface: #2b2f48;
+  --color-on-tertiary-fixed-variant: #424750;
+  --color-secondary-fixed: #65f8f0;
+  --color-surface-variant: #dee0ff;
+  --color-surface: #fbf8ff;
+  --color-surface-bright: #fbf8ff;
+  --color-background: #fbf8ff;
+  --color-outline: #747688;
+  --color-tertiary-container: #686d76;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-tertiary-fixed: #dee2ed;
+  --color-on-error: #ffffff;
+  --color-on-secondary-container: #006f6a;
+  --color-surface-dim: #d5d8f9;
+  --color-on-primary-fixed-variant: #0035bd;
+  --color-tertiary-fixed-dim: #c2c6d1;
+  --color-inverse-on-surface: #f0efff;
+  --color-primary-container: #2d5bff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-highest: #dee0ff;
+  --color-secondary-fixed-dim: #3fdbd4;
+  --color-on-surface-variant: #434656;
+  --color-on-secondary: #ffffff;
+  --color-primary-fixed-dim: #b8c3ff;
+  --color-on-primary-container: #efefff;
+  --color-on-error-container: #93000a;
+  --color-primary: #0040df;
+  --color-surface-container: #ececff;
+  --color-primary-fixed: #dde1ff;
+  --color-inverse-primary: #b8c3ff;
+  --color-outline-variant: #c4c5d9;
+  --color-on-tertiary-fixed: #171c23;
+  --color-secondary: #006a66;
+  --color-on-secondary-fixed-variant: #00504d;
+  --color-surface-tint: #104af0;
+  --color-surface-container-low: #f4f2ff;
+  --color-on-tertiary-container: #ecf0fb;
+  --color-on-tertiary: #ffffff;
+  --color-on-secondary-fixed: #00201e;
+  --color-on-background: #161a32;
+  --color-on-primary-fixed: #001355;
+  --color-secondary-container: #61f5ed;
+
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  --spacing-container-max: 1200px;
+  --spacing-xs: 4px;
+  --spacing-gutter: 20px;
+  --spacing-md: 24px;
+  --spacing-xl: 80px;
+  --spacing-base: 8px;
+  --spacing-sm: 12px;
+  --spacing-lg: 48px;
+
+  --font-body-md: 'Be Vietnam Pro', sans-serif;
+  --font-label-bold: 'Plus Jakarta Sans', sans-serif;
+  --font-body-lg: 'Be Vietnam Pro', sans-serif;
+  --font-display-lg-mobile: 'Plus Jakarta Sans', sans-serif;
+  --font-headline-md: 'Plus Jakarta Sans', sans-serif;
+  --font-korean-support: 'Be Vietnam Pro', sans-serif;
+  --font-display-lg: 'Plus Jakarta Sans', sans-serif;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+  --text-label-bold: 14px;
+  --text-label-bold--line-height: 20px;
+  --text-label-bold--font-weight: 700;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+  --text-display-lg-mobile: 32px;
+  --text-display-lg-mobile--line-height: 38px;
+  --text-display-lg-mobile--letter-spacing: -0.02em;
+  --text-display-lg-mobile--font-weight: 800;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 700;
+  --text-korean-support: 16px;
+  --text-korean-support--line-height: 1.6;
+  --text-korean-support--font-weight: 500;
+  --text-display-lg: 40px;
+  --text-display-lg--line-height: 48px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body-md);
+}
+
+@layer components {
+  .btn-primary {
+    border-bottom-width: 4px;
+    border-color: var(--color-on-primary-fixed-variant);
+    transition: transform 0.1s;
+  }
+  .btn-primary:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    margin-top: 2px;
+  }
+  .btn-primary:disabled {
+    border-bottom-width: 0;
+  }
+  .btn-secondary {
+    transition: transform 0.1s;
+  }
+  .btn-secondary:active {
+    transform: translateY(2px);
+  }
+}
