@@ -29,35 +29,45 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             grasp the cultural nuance, emotion, and rhythm of real conversations.
           </p>
 
-          <div className="w-full max-w-[420px] aspect-video rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary-fixed-dim relative overflow-hidden my-sm">
-            <span className="material-symbols-outlined absolute top-4 left-6 text-on-primary/30 text-xl">
+          <div className="w-full max-w-[420px] aspect-video rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary-fixed-dim relative overflow-hidden my-sm shadow-lg">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.28),transparent_65%)]" />
+
+            <span className="material-symbols-outlined absolute top-5 left-7 text-on-primary/25 text-xl">
               translate
             </span>
-            <span className="material-symbols-outlined absolute top-6 right-9 text-on-primary/25 text-lg">
+            <span className="material-symbols-outlined absolute top-6 right-8 text-on-primary/20 text-lg">
               chat_bubble
             </span>
-            <span className="material-symbols-outlined absolute bottom-9 right-7 text-on-primary/25 text-xl">
+            <span className="material-symbols-outlined absolute bottom-6 right-8 text-on-primary/20 text-lg">
               language
             </span>
-            <span className="material-symbols-outlined absolute bottom-5 left-9 text-on-primary/20 text-base">
+            <span className="material-symbols-outlined absolute top-1/2 left-5 -translate-y-1/2 text-on-primary/15 text-base">
               emoji_objects
             </span>
 
-            <div className="absolute inset-0 flex items-center justify-center gap-3">
-              <span className="material-symbols-outlined text-5xl text-on-primary">
-                record_voice_over
-              </span>
-              <span className="material-symbols-outlined text-3xl text-on-primary/70">
-                sync_alt
-              </span>
-              <span className="material-symbols-outlined text-5xl text-on-primary">
-                psychology
-              </span>
-            </div>
+            <div className="relative h-full flex flex-col items-center justify-center gap-4">
+              <div className="flex items-center gap-4">
+                <span className="h-14 w-14 rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                  <span className="material-symbols-outlined text-3xl text-on-primary">
+                    record_voice_over
+                  </span>
+                </span>
+                <span className="material-symbols-outlined text-2xl text-on-primary/60">
+                  arrow_forward
+                </span>
+                <span className="h-14 w-14 rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-sm">
+                  <span className="material-symbols-outlined text-3xl text-on-primary">
+                    psychology
+                  </span>
+                </span>
+              </div>
 
-            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
-              <span className="material-symbols-outlined text-on-primary text-sm">volume_up</span>
-              <span className="font-label-bold text-on-primary text-xs">SoundNative</span>
+              <div className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
+                <span className="material-symbols-outlined text-on-primary text-sm">
+                  volume_up
+                </span>
+                <span className="font-label-bold text-on-primary text-xs">SoundNative</span>
+              </div>
             </div>
           </div>
 
