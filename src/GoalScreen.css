@@ -1,0 +1,83 @@
+.goal-screen {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.goal-progress {
+  font-size: 14px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.goal-question {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 28px;
+}
+
+.goal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.goal-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.goal-option:hover {
+  border-color: #1a73e8;
+}
+
+.goal-option input[type='radio'] {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.goal-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goal-option-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.goal-option-subtitle {
+  font-size: 13px;
+  color: #888;
+}
+
+.goal-next-button {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.goal-next-button:disabled {
+  background: #ccc;
+  cursor: default;
+}

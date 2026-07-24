@@ -13,3 +13,8 @@ export type EnglishLevel = 'new' | 'basicUnderstanding' | 'mostlyFluent'
 // onboarding. Combined into the same user profile object as UserStatus
 // once the whole onboarding flow is complete.
 export type VisitFrequency = 'daily' | 'weekdays' | 'whenever'
+
+// What the user wants out of the app, collected during onboarding.
+// Combined into the same user profile object as UserStatus once the whole
+// onboarding flow is complete.
+export type LearningGoal = 'dailyLifeConfidence' | 'nativeConnection' | 'nativeLevel'

@@ -4,10 +4,18 @@ import TeaserQuiz from './TeaserQuiz'
 import StatusScreen from './StatusScreen'
 import LevelScreen from './LevelScreen'
 import FrequencyScreen from './FrequencyScreen'
+import GoalScreen from './GoalScreen'
 import PlaceholderScreen from './PlaceholderScreen'
-import type { EnglishLevel, UserStatus, VisitFrequency } from './types'
+import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
-type Screen = 'welcome' | 'teaserQuiz' | 'status' | 'level' | 'frequency' | 'placeholder'
+type Screen =
+  | 'welcome'
+  | 'teaserQuiz'
+  | 'status'
+  | 'level'
+  | 'frequency'
+  | 'goal'
+  | 'placeholder'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
@@ -17,9 +25,10 @@ function App() {
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null)
   const [englishLevel, setEnglishLevel] = useState<EnglishLevel | null>(null)
   const [visitFrequency, setVisitFrequency] = useState<VisitFrequency | null>(null)
+  const [learningGoal, setLearningGoal] = useState<LearningGoal | null>(null)
 
   useEffect(() => {
-    if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency)) {
+    if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency || learningGoal)) {
       console.log(
         '[onboarding] userStatus:',
         userStatus,
@@ -27,9 +36,11 @@ function App() {
         englishLevel,
         'visitFrequency:',
         visitFrequency,
+        'learningGoal:',
+        learningGoal,
       )
     }
-  }, [userStatus, englishLevel, visitFrequency])
+  }, [userStatus, englishLevel, visitFrequency, learningGoal])
 
   return (
     <>
@@ -55,6 +66,14 @@ function App() {
         <FrequencyScreen
           onNext={(frequency) => {
             setVisitFrequency(frequency)
+            setScreen('goal')
+          }}
+        />
+      )}
+      {screen === 'goal' && (
+        <GoalScreen
+          onNext={(goal) => {
+            setLearningGoal(goal)
             setScreen('placeholder')
           }}
         />
