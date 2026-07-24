@@ -29,8 +29,36 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             grasp the cultural nuance, emotion, and rhythm of real conversations.
           </p>
 
-          <div className="w-full max-w-[420px] aspect-video rounded-xl bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center my-sm">
-            <span className="material-symbols-outlined text-6xl text-on-primary/80">forum</span>
+          <div className="w-full max-w-[420px] aspect-video rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary-fixed-dim relative overflow-hidden my-sm">
+            <span className="material-symbols-outlined absolute top-4 left-6 text-on-primary/30 text-xl">
+              translate
+            </span>
+            <span className="material-symbols-outlined absolute top-6 right-9 text-on-primary/25 text-lg">
+              chat_bubble
+            </span>
+            <span className="material-symbols-outlined absolute bottom-9 right-7 text-on-primary/25 text-xl">
+              language
+            </span>
+            <span className="material-symbols-outlined absolute bottom-5 left-9 text-on-primary/20 text-base">
+              emoji_objects
+            </span>
+
+            <div className="absolute inset-0 flex items-center justify-center gap-3">
+              <span className="material-symbols-outlined text-5xl text-on-primary">
+                record_voice_over
+              </span>
+              <span className="material-symbols-outlined text-3xl text-on-primary/70">
+                sync_alt
+              </span>
+              <span className="material-symbols-outlined text-5xl text-on-primary">
+                psychology
+              </span>
+            </div>
+
+            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
+              <span className="material-symbols-outlined text-on-primary text-sm">volume_up</span>
+              <span className="font-label-bold text-on-primary text-xs">SoundNative</span>
+            </div>
           </div>
 
           <button
