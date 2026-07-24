@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import WelcomeScreen from './WelcomeScreen'
 import TeaserQuiz from './TeaserQuiz'
 import StatusScreen from './StatusScreen'
+import LevelScreen from './LevelScreen'
 import PlaceholderScreen from './PlaceholderScreen'
-import type { UserStatus } from './types'
+import type { EnglishLevel, UserStatus } from './types'
 
-type Screen = 'welcome' | 'teaserQuiz' | 'status' | 'placeholder'
+type Screen = 'welcome' | 'teaserQuiz' | 'status' | 'level' | 'placeholder'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
@@ -13,12 +14,13 @@ function App() {
   // (goal/motivation/level/daily goal/profiling) and written to localStorage
   // once the whole onboarding flow is complete — not yet.
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null)
+  const [englishLevel, setEnglishLevel] = useState<EnglishLevel | null>(null)
 
   useEffect(() => {
-    if (import.meta.env.DEV && userStatus) {
-      console.log('[onboarding] userStatus:', userStatus)
+    if (import.meta.env.DEV && (userStatus || englishLevel)) {
+      console.log('[onboarding] userStatus:', userStatus, 'englishLevel:', englishLevel)
     }
-  }, [userStatus])
+  }, [userStatus, englishLevel])
 
   return (
     <>
@@ -28,6 +30,14 @@ function App() {
         <StatusScreen
           onNext={(status) => {
             setUserStatus(status)
+            setScreen('level')
+          }}
+        />
+      )}
+      {screen === 'level' && (
+        <LevelScreen
+          onNext={(level) => {
+            setEnglishLevel(level)
             setScreen('placeholder')
           }}
         />
