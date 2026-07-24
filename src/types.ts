@@ -8,3 +8,8 @@ export type UserStatus = 'student' | 'workingHoliday' | 'immigrant' | 'expatWork
 // during onboarding. Combined into the same user profile object as
 // UserStatus once the whole onboarding flow is complete.
 export type EnglishLevel = 'new' | 'basicUnderstanding' | 'mostlyFluent'
+
+// How often the user expects to visit/practice, collected during
+// onboarding. Combined into the same user profile object as UserStatus
+// once the whole onboarding flow is complete.
+export type VisitFrequency = 'daily' | 'weekdays' | 'whenever'

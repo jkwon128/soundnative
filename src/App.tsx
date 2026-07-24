@@ -3,10 +3,11 @@ import WelcomeScreen from './WelcomeScreen'
 import TeaserQuiz from './TeaserQuiz'
 import StatusScreen from './StatusScreen'
 import LevelScreen from './LevelScreen'
+import FrequencyScreen from './FrequencyScreen'
 import PlaceholderScreen from './PlaceholderScreen'
-import type { EnglishLevel, UserStatus } from './types'
+import type { EnglishLevel, UserStatus, VisitFrequency } from './types'
 
-type Screen = 'welcome' | 'teaserQuiz' | 'status' | 'level' | 'placeholder'
+type Screen = 'welcome' | 'teaserQuiz' | 'status' | 'level' | 'frequency' | 'placeholder'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
@@ -15,12 +16,20 @@ function App() {
   // once the whole onboarding flow is complete — not yet.
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null)
   const [englishLevel, setEnglishLevel] = useState<EnglishLevel | null>(null)
+  const [visitFrequency, setVisitFrequency] = useState<VisitFrequency | null>(null)
 
   useEffect(() => {
-    if (import.meta.env.DEV && (userStatus || englishLevel)) {
-      console.log('[onboarding] userStatus:', userStatus, 'englishLevel:', englishLevel)
+    if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency)) {
+      console.log(
+        '[onboarding] userStatus:',
+        userStatus,
+        'englishLevel:',
+        englishLevel,
+        'visitFrequency:',
+        visitFrequency,
+      )
     }
-  }, [userStatus, englishLevel])
+  }, [userStatus, englishLevel, visitFrequency])
 
   return (
     <>
@@ -38,6 +47,14 @@ function App() {
         <LevelScreen
           onNext={(level) => {
             setEnglishLevel(level)
+            setScreen('frequency')
+          }}
+        />
+      )}
+      {screen === 'frequency' && (
+        <FrequencyScreen
+          onNext={(frequency) => {
+            setVisitFrequency(frequency)
             setScreen('placeholder')
           }}
         />
