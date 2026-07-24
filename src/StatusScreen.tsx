@@ -77,7 +77,7 @@ function StatusScreen({ onNext }: StatusScreenProps) {
         </div>
 
         <div className="text-center flex flex-col gap-1 mt-sm mb-sm">
-          <h1 className="font-headline-md text-headline-md text-primary">
+          <h1 className="font-headline-md text-headline-md text-on-surface">
             지금 영어권에서 어떤 상황이신가요?
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
@@ -89,7 +89,11 @@ function StatusScreen({ onNext }: StatusScreenProps) {
           {STATUS_OPTIONS.map((option) => (
             <label
               key={option.value}
-              className="flex items-center justify-between gap-md bg-surface-container-lowest border border-outline-variant rounded-xl px-md py-sm cursor-pointer hover:border-primary transition-colors"
+              className={`flex items-center justify-between gap-md bg-surface-container-lowest border rounded-xl px-md py-sm cursor-pointer transition-colors ${
+                selected === option.value
+                  ? 'border-primary'
+                  : 'border-outline-variant hover:border-primary'
+              }`}
             >
               <div className="flex items-center gap-sm">
                 <input
@@ -116,7 +120,7 @@ function StatusScreen({ onNext }: StatusScreenProps) {
         </div>
 
         <button
-          className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex items-center justify-center gap-2 cursor-pointer disabled:bg-outline-variant disabled:border-outline-variant disabled:cursor-default"
+          className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex items-center justify-center gap-2 cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
           disabled={selected === null}
           onClick={() => selected !== null && onNext(selected)}
         >
