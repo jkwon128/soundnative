@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { EnglishLevel } from './types'
 import './LevelScreen.css'
 
-const TOTAL_ONBOARDING_STEPS = 6
+const TOTAL_ONBOARDING_STEPS = 5
 const CURRENT_STEP = 2
 
 interface LevelOption {

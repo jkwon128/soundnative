@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import './AuthScreen.css'
 
-const TOTAL_ONBOARDING_STEPS = 6
-const CURRENT_STEP = 6
+const TOTAL_ONBOARDING_STEPS = 5
+const CURRENT_STEP = 5
 
 interface AuthScreenProps {
   // Dummy navigation only — no real signup/login/API/DB logic here.

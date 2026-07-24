@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { VisitFrequency } from './types'
 import './FrequencyScreen.css'
 
-const TOTAL_ONBOARDING_STEPS = 6
+const TOTAL_ONBOARDING_STEPS = 5
 const CURRENT_STEP = 3
 
 interface FrequencyOption {

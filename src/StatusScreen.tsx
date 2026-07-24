@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { UserStatus } from './types'
 import './StatusScreen.css'
 
-const TOTAL_ONBOARDING_STEPS = 6
+const TOTAL_ONBOARDING_STEPS = 5
 const CURRENT_STEP = 1
 
 interface StatusOption {
