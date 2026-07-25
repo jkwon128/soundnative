@@ -104,7 +104,7 @@ body {
 
 @layer components {
   .bg-soundwave {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='48' viewBox='0 0 160 48'%3E%3Cpath d='M0 24 Q 20 4 40 24 T 80 24 T 120 24 T 160 24' fill='none' stroke='%23434656' stroke-width='2' stroke-linecap='round' opacity='0.05'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'%3E%3Cpath d='M0 14 Q 11.25 5 22.5 14 T 45 14 T 67.5 14 T 90 14' fill='none' stroke='%23434656' stroke-width='1.25' stroke-linecap='round' opacity='0.035'/%3E%3C/svg%3E");
     background-repeat: repeat;
   }
 

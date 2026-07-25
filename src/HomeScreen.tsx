@@ -13,7 +13,7 @@ type NodeState = 'completed' | 'today' | 'future'
 // node occupies a fixed-height vertical slot so connector geometry below can
 // be computed without measuring the DOM.
 const OFFSET_PATTERN = [0, -1, 0, 1]
-const OFFSET_X = 56
+const OFFSET_X = 22
 const PATH_WIDTH = 300
 const SLOT_HEIGHT = 132
 const NODE_ZONE = 96
@@ -65,7 +65,11 @@ function HomeScreen({ onOpenQuest, onOpenDecode }: HomeScreenProps) {
                 const dx = x1 - x0
                 const dy = SLOT_HEIGHT
                 const length = Math.hypot(dx, dy)
-                const angleDeg = (Math.atan2(dx, dy) * 180) / Math.PI
+                // translateX(-50%) + rotate() compose around the element's own
+                // transform-origin, which mirrors a plain atan2(dx, dy) angle
+                // horizontally — negate it so the far end lands on (x1, y1)
+                // instead of its mirror image.
+                const angleDeg = -(Math.atan2(dx, dy) * 180) / Math.PI
                 const walked = i < todayIndex
 
                 return (
