@@ -40,17 +40,17 @@ interface TeaserQuizProps {
 function TeaserQuiz({ onComplete }: TeaserQuizProps) {
   const [questions] = useState<QuizQuestion[]>(() => pickTeaserQuestions())
   const [index, setIndex] = useState(0)
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | 'A' | 'B' | null>(null)
   const [status, setStatus] = useState<AnswerStatus>('unanswered')
 
   const question = questions[index]
   const isLastQuestion = index === questions.length - 1
   const meta = CATEGORY_META[question.category]
 
-  const handleSelect = (choiceIndex: number) => {
+  const handleSelect = (choice: number | 'A' | 'B') => {
     if (status !== 'unanswered') return
-    setSelected(choiceIndex)
-    setStatus(choiceIndex === question.answer ? 'correct' : 'incorrect')
+    setSelected(choice)
+    setStatus(choice === question.answer ? 'correct' : 'incorrect')
   }
 
   const handleRetry = () => {
@@ -97,53 +97,110 @@ function TeaserQuiz({ onComplete }: TeaserQuizProps) {
 
           <p className="font-body-md text-body-md text-on-surface-variant">{question.situation}</p>
 
-          <h2 className="font-headline-md text-headline-md text-on-surface">"{question.phrase}"</h2>
+          {question.type !== 'tone' && question.phrase && (
+            <>
+              <h2 className="font-headline-md text-headline-md text-on-surface">
+                "{question.phrase}"
+              </h2>
 
-          <button
-            className="flex items-center gap-sm w-fit cursor-pointer"
-            onClick={() => speak(question.phrase)}
-          >
-            <span className="h-9 w-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined text-xl">play_arrow</span>
-            </span>
-            <span className="font-body-md text-sm text-on-surface-variant">
-              Listen to pronunciation
-            </span>
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-sm">
-          {question.choices.map((choice, i) => {
-            const isSelected = selected === i
-            const showCorrect = status === 'correct' && isSelected
-            const showIncorrect = status === 'incorrect' && isSelected
-            return (
               <button
-                key={i}
-                className={`flex items-center justify-between gap-md bg-surface-container-lowest border rounded-xl px-md py-sm text-left cursor-pointer transition-colors disabled:cursor-default ${
-                  showCorrect
-                    ? 'border-secondary bg-secondary-container/20'
-                    : showIncorrect
-                      ? 'border-error bg-error-container/40'
-                      : 'border-outline-variant hover:border-primary'
-                }`}
-                onClick={() => handleSelect(i)}
-                disabled={status !== 'unanswered'}
+                className="flex items-center gap-sm w-fit cursor-pointer"
+                onClick={() => speak(question.phrase!)}
               >
-                <span className="font-body-lg text-body-lg text-on-surface">"{choice}"</span>
-                <span
-                  className={`h-5 w-5 shrink-0 rounded-full border-2 ${
-                    showCorrect
-                      ? 'border-secondary bg-secondary'
-                      : showIncorrect
-                        ? 'border-error bg-error'
-                        : 'border-outline-variant'
-                  }`}
-                />
+                <span className="h-9 w-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-xl">play_arrow</span>
+                </span>
+                <span className="font-body-md text-sm text-on-surface-variant">
+                  Listen to pronunciation
+                </span>
               </button>
-            )
-          })}
+            </>
+          )}
         </div>
+
+        {question.type === 'tone' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+            {(['A', 'B'] as const).map((label) => {
+              const text = label === 'A' ? question.phraseA : question.phraseB
+              const isSelected = selected === label
+              const showCorrect = status === 'correct' && isSelected
+              const showIncorrect = status === 'incorrect' && isSelected
+              return (
+                <button
+                  key={label}
+                  className={`flex flex-col gap-sm bg-surface-container-lowest border rounded-xl p-md text-left cursor-pointer transition-colors disabled:cursor-default ${
+                    showCorrect
+                      ? 'border-secondary bg-secondary-container/20'
+                      : showIncorrect
+                        ? 'border-error bg-error-container/40'
+                        : 'border-outline-variant hover:border-primary'
+                  }`}
+                  onClick={() => handleSelect(label)}
+                  disabled={status !== 'unanswered'}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`h-7 w-7 shrink-0 rounded-full border-2 flex items-center justify-center font-label-bold text-label-bold ${
+                        showCorrect
+                          ? 'border-secondary bg-secondary text-on-secondary'
+                          : showIncorrect
+                            ? 'border-error bg-error text-on-error'
+                            : 'border-outline-variant text-on-surface-variant'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="h-8 w-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        speak(text)
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-lg">play_arrow</span>
+                    </span>
+                  </div>
+                  <span className="font-body-lg text-body-lg text-on-surface">"{text}"</span>
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-sm">
+            {question.choices.map((choice, i) => {
+              const isSelected = selected === i
+              const showCorrect = status === 'correct' && isSelected
+              const showIncorrect = status === 'incorrect' && isSelected
+              return (
+                <button
+                  key={i}
+                  className={`flex items-center justify-between gap-md bg-surface-container-lowest border rounded-xl px-md py-sm text-left cursor-pointer transition-colors disabled:cursor-default ${
+                    showCorrect
+                      ? 'border-secondary bg-secondary-container/20'
+                      : showIncorrect
+                        ? 'border-error bg-error-container/40'
+                        : 'border-outline-variant hover:border-primary'
+                  }`}
+                  onClick={() => handleSelect(i)}
+                  disabled={status !== 'unanswered'}
+                >
+                  <span className="font-body-lg text-body-lg text-on-surface">"{choice}"</span>
+                  <span
+                    className={`h-5 w-5 shrink-0 rounded-full border-2 ${
+                      showCorrect
+                        ? 'border-secondary bg-secondary'
+                        : showIncorrect
+                          ? 'border-error bg-error'
+                          : 'border-outline-variant'
+                    }`}
+                  />
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {status === 'correct' && (
           <div className="bg-secondary-container/20 border border-secondary rounded-xl p-md">

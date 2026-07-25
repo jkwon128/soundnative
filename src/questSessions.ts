@@ -2,7 +2,7 @@ import { quizQuestions, type QuizCategory, type QuizQuestion } from './quizData'
 import { SITUATION_CHIPS, loadOnboardingSituations } from './situations'
 import { getDevIgnoreSituationFilter } from './questSelection'
 
-export const SESSION_SIZE = 3
+export const SESSION_SIZE = 4
 
 // Below this many matches, a category filter is considered too narrow to be
 // usable and we fall back to the full session pool instead of showing a
