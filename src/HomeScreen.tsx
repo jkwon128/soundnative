@@ -1,6 +1,7 @@
 import { ALL_SESSIONS, type QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
 import { getCurrentQuestionIndex, loadStreak } from './dailyQuest'
+import { loadNotes } from './notes'
 import Logo from './Logo'
 
 // Decorative only — not backed by any real currency/reward logic yet.
@@ -23,11 +24,13 @@ const TODAY_NODE_SIZE = 88
 interface HomeScreenProps {
   onOpenQuest: (session: QuestSession) => void
   onOpenDecode: () => void
+  onOpenNotes: () => void
 }
 
-function HomeScreen({ onOpenQuest, onOpenDecode }: HomeScreenProps) {
+function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes }: HomeScreenProps) {
   const streak = loadStreak().streak
   const todayIndex = getCurrentQuestionIndex(ALL_SESSIONS.length)
+  const noteCount = loadNotes().length
 
   const nodeCenterX = (i: number) => PATH_WIDTH / 2 + OFFSET_PATTERN[i % 4] * OFFSET_X
   const nodeCenterY = (i: number) => i * SLOT_HEIGHT + NODE_ZONE / 2
@@ -173,17 +176,32 @@ function HomeScreen({ onOpenQuest, onOpenDecode }: HomeScreenProps) {
           </div>
         </div>
 
-        <div className="md:sticky md:top-24 w-full max-w-[320px] md:w-60 shrink-0 bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center flex flex-col items-center gap-sm shadow-[0_10px_28px_rgba(22,26,50,0.08)]">
-          <span className="material-symbols-outlined text-primary text-3xl">graphic_eq</span>
-          <p className="font-label-bold text-body-lg text-on-surface">
-            지금 무슨 말인지 모르겠나요?
-          </p>
-          <button
-            className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer"
-            onClick={onOpenDecode}
-          >
-            Decode 열기
-          </button>
+        <div className="md:sticky md:top-24 w-full max-w-[320px] md:w-60 shrink-0 flex flex-col gap-md">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center flex flex-col items-center gap-sm shadow-[0_10px_28px_rgba(22,26,50,0.08)]">
+            <span className="material-symbols-outlined text-primary text-3xl">graphic_eq</span>
+            <p className="font-label-bold text-body-lg text-on-surface">
+              지금 무슨 말인지 모르겠나요?
+            </p>
+            <button
+              className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer"
+              onClick={onOpenDecode}
+            >
+              Decode 열기
+            </button>
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center flex flex-col items-center gap-sm shadow-[0_10px_28px_rgba(22,26,50,0.08)]">
+            <span className="material-symbols-outlined text-secondary text-3xl">bookmark</span>
+            <p className="font-label-bold text-body-lg text-on-surface">
+              지금까지 배운 표현 {noteCount}개
+            </p>
+            <button
+              className="btn-secondary w-full flex items-center justify-center gap-sm bg-surface-container-lowest border border-outline text-on-surface font-label-bold text-label-bold py-sm px-md rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+              onClick={onOpenNotes}
+            >
+              노트 보기
+            </button>
+          </div>
         </div>
       </div>
     </div>

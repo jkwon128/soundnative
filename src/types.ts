@@ -18,3 +18,18 @@ export type VisitFrequency = 'daily' | 'weekdays' | 'whenever'
 // Combined into the same user profile object as UserStatus once the whole
 // onboarding flow is complete.
 export type LearningGoal = 'dailyLifeConfidence' | 'nativeConnection' | 'nativeLevel'
+
+// A single entry in the user's Notes screen — either auto-captured from a
+// correctly-answered quiz question, or freely written by the user.
+export interface NoteEntry {
+  id: string
+  type: 'auto' | 'manual'
+  createdAt: string // ISO date
+  // type === 'auto'
+  questionId?: string // quizData question id — dedup key so a re-answered question isn't saved twice
+  phrase?: string
+  meaning?: string
+  category?: string
+  // type === 'manual'
+  content?: string
+}

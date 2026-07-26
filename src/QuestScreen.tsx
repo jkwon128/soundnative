@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
 import { computeNextStreak, getTodayDateString, loadStreak, saveStreak } from './dailyQuest'
+import { addAutoNote } from './notes'
 import QuizFeedbackFooter, { type AnswerStatus } from './QuizFeedbackFooter'
 
 function speak(text: string) {
@@ -29,7 +30,9 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
   const handleSelect = (choice: number | 'A' | 'B') => {
     if (status !== 'unanswered') return
     setSelected(choice)
-    setStatus(choice === question.answer ? 'correct' : 'incorrect')
+    const isCorrect = choice === question.answer
+    setStatus(isCorrect ? 'correct' : 'incorrect')
+    if (isCorrect) addAutoNote(question)
   }
 
   const handleRetry = () => {

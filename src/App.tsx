@@ -9,6 +9,7 @@ import AuthScreen from './AuthScreen'
 import HomeScreen from './HomeScreen'
 import QuestScreen from './QuestScreen'
 import DecodeScreen from './DecodeScreen'
+import NoteScreen from './NoteScreen'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
@@ -23,6 +24,7 @@ type Screen =
   | 'home'
   | 'quest'
   | 'decode'
+  | 'notes'
 
 function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
@@ -94,12 +96,14 @@ function App() {
             setScreen('quest')
           }}
           onOpenDecode={() => setScreen('decode')}
+          onOpenNotes={() => setScreen('notes')}
         />
       )}
       {screen === 'quest' && activeSession && (
         <QuestScreen session={activeSession} onExit={() => setScreen('home')} />
       )}
       {screen === 'decode' && <DecodeScreen onBack={() => setScreen('home')} />}
+      {screen === 'notes' && <NoteScreen onBack={() => setScreen('home')} />}
     </>
   )
 }
