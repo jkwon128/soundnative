@@ -10,6 +10,10 @@ export const SESSION_SIZE = 4
 const MIN_FILTERED_SESSIONS = 2
 
 export interface QuestSession {
+  // Stable across re-filtering/reordering of the sessions array — derived
+  // from category + position within category, not array index. Completion
+  // tracking (sessionProgress.ts) keys off this, not the array position.
+  id: string
   category: QuizCategory
   questions: QuizQuestion[]
 }
@@ -26,6 +30,7 @@ function buildSessions(): QuestSession[] {
 
     for (let i = 0; i < sessionCount; i++) {
       sessions.push({
+        id: `${category}-${i}`,
         category,
         questions: questionsInCategory.slice(i * SESSION_SIZE, i * SESSION_SIZE + SESSION_SIZE),
       })

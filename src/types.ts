@@ -30,6 +30,7 @@ export interface NoteEntry {
   phrase?: string
   meaning?: string
   category?: string
+  memo?: string // optional note the user added on top of an auto-captured entry
   // type === 'manual'
   content?: string
 }

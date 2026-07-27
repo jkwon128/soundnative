@@ -1,7 +1,8 @@
 import { ALL_SESSIONS, type QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
-import { getCurrentQuestionIndex, loadStreak } from './dailyQuest'
+import { loadStreak } from './dailyQuest'
 import { loadNotes } from './notes'
+import { loadCompletedSessionIds } from './sessionProgress'
 import Logo from './Logo'
 
 // Decorative only — not backed by any real currency/reward logic yet.
@@ -25,12 +26,23 @@ interface HomeScreenProps {
   onOpenQuest: (session: QuestSession) => void
   onOpenDecode: () => void
   onOpenNotes: () => void
+  onOpenPricing: () => void
 }
 
-function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes }: HomeScreenProps) {
+function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenPricing }: HomeScreenProps) {
   const streak = loadStreak().streak
-  const todayIndex = getCurrentQuestionIndex(ALL_SESSIONS.length)
   const noteCount = loadNotes().length
+
+  // "Today" is progress-based (the first session the user hasn't finished
+  // yet), not calendar-based — a brand-new user has completed nothing, so
+  // this resolves to index 0 rather than however many sessions have elapsed
+  // since day 0. Membership in completedSessionIds (keyed by session.id, not
+  // array index) is the only thing that marks a node "completed".
+  const completedSessionIds = new Set(loadCompletedSessionIds())
+  const firstIncompleteIndex = ALL_SESSIONS.findIndex(
+    (session) => !completedSessionIds.has(session.id),
+  )
+  const todayIndex = firstIncompleteIndex === -1 ? ALL_SESSIONS.length : firstIncompleteIndex
 
   const nodeCenterX = (i: number) => PATH_WIDTH / 2 + OFFSET_PATTERN[i % 4] * OFFSET_X
   const nodeCenterY = (i: number) => i * SLOT_HEIGHT + NODE_ZONE / 2
@@ -96,8 +108,11 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes }: HomeScreenProps)
             <div className="relative flex flex-col items-center">
               {ALL_SESSIONS.map((session, i) => {
                 const meta = CATEGORY_META[session.category]
-                const state: NodeState =
-                  i < todayIndex ? 'completed' : i === todayIndex ? 'today' : 'future'
+                const state: NodeState = completedSessionIds.has(session.id)
+                  ? 'completed'
+                  : i === todayIndex
+                    ? 'today'
+                    : 'future'
                 const clickable = state !== 'future'
                 const isToday = state === 'today'
                 const size = isToday ? TODAY_NODE_SIZE : BASE_NODE_SIZE
@@ -200,6 +215,17 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes }: HomeScreenProps)
               onClick={onOpenNotes}
             >
               노트 보기
+            </button>
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center flex flex-col items-center gap-sm shadow-[0_10px_28px_rgba(22,26,50,0.08)]">
+            <span className="material-symbols-outlined text-primary text-3xl">diamond</span>
+            <p className="font-label-bold text-body-lg text-on-surface">프리미엄으로 업그레이드</p>
+            <button
+              className="btn-secondary w-full flex items-center justify-center gap-sm bg-surface-container-lowest border border-outline text-on-surface font-label-bold text-label-bold py-sm px-md rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+              onClick={onOpenPricing}
+            >
+              프리미엄 보기
             </button>
           </div>
         </div>

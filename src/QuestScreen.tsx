@@ -2,8 +2,11 @@ import { useState } from 'react'
 import type { QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
 import { computeNextStreak, getTodayDateString, loadStreak, saveStreak } from './dailyQuest'
-import { addAutoNote } from './notes'
+import { addAutoNote, getNotePhrase, hasNoteForQuestion } from './notes'
+import { markSessionCompleted } from './sessionProgress'
 import QuizFeedbackFooter, { type AnswerStatus } from './QuizFeedbackFooter'
+
+type NoteButtonState = 'idle' | 'panelOpen' | 'saved'
 
 function speak(text: string) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
@@ -27,12 +30,15 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
   const isLastQuestion = index === session.questions.length - 1
   const meta = CATEGORY_META[question.category]
 
+  const [noteButtonState, setNoteButtonState] = useState<NoteButtonState>(() =>
+    hasNoteForQuestion(question.id) ? 'saved' : 'idle',
+  )
+  const [noteMemoDraft, setNoteMemoDraft] = useState('')
+
   const handleSelect = (choice: number | 'A' | 'B') => {
     if (status !== 'unanswered') return
     setSelected(choice)
-    const isCorrect = choice === question.answer
-    setStatus(isCorrect ? 'correct' : 'incorrect')
-    if (isCorrect) addAutoNote(question)
+    setStatus(choice === question.answer ? 'correct' : 'incorrect')
   }
 
   const handleRetry = () => {
@@ -44,17 +50,32 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
     if (isLastQuestion) {
       const today = getTodayDateString()
       saveStreak({ streak: computeNextStreak(loadStreak(), today), lastPlayedDate: today })
+      markSessionCompleted(session.id)
       onExit()
       return
     }
+    const nextQuestion = session.questions[index + 1]
     setIndex((i) => i + 1)
     setSelected(null)
     setStatus('unanswered')
+    setNoteButtonState(hasNoteForQuestion(nextQuestion.id) ? 'saved' : 'idle')
+    setNoteMemoDraft('')
   }
 
   const handleFooterClick = () => {
     if (status === 'correct') handleNext()
     else if (status === 'incorrect') handleRetry()
+  }
+
+  const handleSaveNote = () => {
+    addAutoNote(question, noteMemoDraft)
+    setNoteButtonState('saved')
+    setNoteMemoDraft('')
+  }
+
+  const handleCancelNote = () => {
+    setNoteButtonState('idle')
+    setNoteMemoDraft('')
   }
 
   return (
@@ -196,10 +217,66 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
         )}
 
         {status === 'correct' && (
-          <div className="bg-secondary-container/20 border border-secondary rounded-xl p-md">
-            <p className="font-body-md text-body-md text-on-surface-variant">
+          <div className="bg-secondary-container/20 border border-secondary rounded-xl p-md flex flex-wrap items-start gap-sm">
+            <p className="flex-1 min-w-[160px] font-body-md text-body-md text-on-surface-variant">
               {question.explanation}
             </p>
+
+            {noteButtonState === 'saved' && (
+              <button
+                className="flex items-center gap-1 ml-auto shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg py-1 px-sm font-label-bold text-xs text-on-surface-variant cursor-default"
+                disabled
+              >
+                <span className="material-symbols-outlined text-base text-secondary">
+                  check_circle
+                </span>
+                노트에 추가됨
+              </button>
+            )}
+
+            {noteButtonState === 'idle' && (
+              <button
+                className="flex items-center gap-1 ml-auto shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg py-1 px-sm font-label-bold text-xs text-primary cursor-pointer"
+                onClick={() => setNoteButtonState('panelOpen')}
+              >
+                <span className="material-symbols-outlined text-base">bookmark_add</span>
+                노트에 추가하기
+              </button>
+            )}
+          </div>
+        )}
+
+        {status === 'correct' && noteButtonState === 'panelOpen' && (
+          <div className="flex flex-col gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+            <div className="flex flex-col gap-1">
+              <p className="font-headline-md text-body-lg text-on-surface">
+                "{getNotePhrase(question)}"
+              </p>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                {question.explanation}
+              </p>
+            </div>
+            <textarea
+              autoFocus
+              className="w-full min-h-16 bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors resize-y"
+              placeholder="메모 추가 (선택)"
+              value={noteMemoDraft}
+              onChange={(e) => setNoteMemoDraft(e.target.value)}
+            />
+            <div className="flex gap-sm justify-end">
+              <button
+                className="font-label-bold text-label-bold text-on-surface-variant py-sm px-md rounded-lg cursor-pointer"
+                onClick={handleCancelNote}
+              >
+                취소
+              </button>
+              <button
+                className="btn-primary bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer"
+                onClick={handleSaveNote}
+              >
+                저장
+              </button>
+            </div>
           </div>
         )}
 

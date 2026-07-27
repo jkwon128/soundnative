@@ -141,6 +141,14 @@ function NoteScreen({ onBack }: NoteScreenProps) {
                     <div className="flex flex-col gap-1">
                       <p className="font-headline-md text-body-lg text-on-surface">"{note.phrase}"</p>
                       <p className="font-body-md text-body-md text-on-surface-variant">{note.meaning}</p>
+                      {note.memo && (
+                        <div className="mt-1 pt-2 border-t border-outline-variant flex flex-col gap-0.5">
+                          <span className="font-label-bold text-xs text-primary">내 메모</span>
+                          <p className="font-body-md text-body-md text-on-surface whitespace-pre-wrap">
+                            {note.memo}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <p className="font-body-md text-body-md text-on-surface whitespace-pre-wrap">
