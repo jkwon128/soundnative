@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { saveCustomerEmail } from './customerEmail'
 
 interface CheckoutStatusInfo {
   status: 'open' | 'expired' | 'confirmed' | 'succeeded' | 'failed'
   productName: string | null
+  customerEmail: string | null
   amount: number
   currency: string
 }
@@ -54,7 +56,12 @@ function CheckoutSuccessScreen({ checkoutId, onDone }: CheckoutSuccessScreenProp
       .then(async (response) => {
         const data = await response.json()
         if (!response.ok) throw new Error(data?.error || '결제 상태를 확인하지 못했습니다.')
-        if (!cancelled) setInfo(data as CheckoutStatusInfo)
+        const statusInfo = data as CheckoutStatusInfo
+        // The email the user typed at checkout is the only address we ever
+        // send them anything to — capture it once here instead of asking
+        // again anywhere else in the app.
+        if (statusInfo.customerEmail) saveCustomerEmail(statusInfo.customerEmail)
+        if (!cancelled) setInfo(statusInfo)
       })
       .catch((err) => {
         if (!cancelled) {

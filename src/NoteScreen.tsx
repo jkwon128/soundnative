@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { loadNotes, addManualNote, deleteNote } from './notes'
 import { CATEGORY_META } from './categoryMeta'
-import { getTodayDateString, getYesterdayDateString } from './dailyQuest'
+import { groupNotesByDate, sortNotesNewestFirst } from './noteGrouping'
+import { loadCustomerEmail } from './customerEmail'
 import type { QuizCategory } from './quizData'
 import type { NoteEntry } from './types'
 
@@ -9,11 +10,7 @@ interface NoteScreenProps {
   onBack: () => void
 }
 
-interface NoteGroup {
-  key: string
-  label: string
-  notes: NoteEntry[]
-}
+type EmailStatus = 'idle' | 'sending' | 'sent' | 'error'
 
 function formatDate(iso: string): string {
   const date = new Date(iso)
@@ -21,55 +18,18 @@ function formatDate(iso: string): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
 }
 
-// Local-date key ("YYYY-MM-DD") for a note's createdAt, in the same shape
-// dailyQuest's getTodayDateString/getYesterdayDateString use — so today/
-// yesterday comparisons line up exactly.
-function dateKey(iso: string): string {
-  const date = new Date(iso)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-function groupHeaderLabel(key: string, todayKey: string, yesterdayKey: string): string {
-  const [, monthStr, dayStr] = key.split('-')
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (key === todayKey) return `오늘 (${month}/${day}) 배운 표현`
-  if (key === yesterdayKey) return `어제 (${month}/${day}) 배운 표현`
-  return `${month}월 ${day}일 배운 표현`
-}
-
-// notes is expected newest-first already, so grouping while iterating keeps
-// both the groups and each group's notes in that same order.
-function groupNotesByDate(sorted: NoteEntry[]): NoteGroup[] {
-  const todayKey = getTodayDateString()
-  const yesterdayKey = getYesterdayDateString(todayKey)
-  const groups: NoteGroup[] = []
-  const groupIndexByKey = new Map<string, number>()
-
-  for (const note of sorted) {
-    const key = dateKey(note.createdAt)
-    let index = groupIndexByKey.get(key)
-    if (index === undefined) {
-      index = groups.length
-      groupIndexByKey.set(key, index)
-      groups.push({ key, label: groupHeaderLabel(key, todayKey, yesterdayKey), notes: [] })
-    }
-    groups[index].notes.push(note)
-  }
-
-  return groups
-}
-
 function NoteScreen({ onBack }: NoteScreenProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => loadNotes())
   const [isWriting, setIsWriting] = useState(false)
   const [draft, setDraft] = useState('')
 
-  const sortedNotes = [...notes].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  const [isEmailFormOpen, setIsEmailFormOpen] = useState(false)
+  const [emailStatus, setEmailStatus] = useState<EmailStatus>('idle')
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const customerEmail = loadCustomerEmail()
+  const canSendEmail = notes.length > 0 && Boolean(customerEmail)
+
+  const sortedNotes = sortNotesNewestFirst(notes)
   const noteGroups = groupNotesByDate(sortedNotes)
 
   const handleSaveDraft = () => {
@@ -88,6 +48,46 @@ function NoteScreen({ onBack }: NoteScreenProps) {
   const handleDelete = (id: string) => {
     deleteNote(id)
     setNotes(loadNotes())
+  }
+
+  const handleOpenEmailForm = () => {
+    if (!canSendEmail) return
+    setIsEmailFormOpen(true)
+    setEmailStatus('idle')
+    setEmailError(null)
+  }
+
+  const handleCancelEmailForm = () => {
+    setIsEmailFormOpen(false)
+    setEmailStatus('idle')
+    setEmailError(null)
+  }
+
+  const handleSendEmail = async () => {
+    if (emailStatus === 'sending' || !customerEmail) return
+    setEmailStatus('sending')
+    setEmailError(null)
+
+    try {
+      const response = await fetch('/api/send-notes-email', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: customerEmail, notes: loadNotes() }),
+      })
+      const data = await response.json()
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || '이메일 전송에 실패했습니다.')
+      }
+      setEmailStatus('sent')
+      // Show the confirmation briefly, then close.
+      setTimeout(() => {
+        setIsEmailFormOpen(false)
+        setEmailStatus('idle')
+      }, 1500)
+    } catch (err) {
+      setEmailStatus('error')
+      setEmailError(err instanceof Error ? err.message : '이메일 전송에 실패했습니다.')
+    }
   }
 
   return (
@@ -140,6 +140,63 @@ function NoteScreen({ onBack }: NoteScreenProps) {
                 저장
               </button>
             </div>
+          </div>
+        )}
+
+        {!isEmailFormOpen ? (
+          <div className="flex flex-col gap-1">
+            <button
+              className="flex items-center justify-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg py-sm px-md font-label-bold text-label-bold text-primary cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+              onClick={handleOpenEmailForm}
+              disabled={!canSendEmail}
+            >
+              <span className="material-symbols-outlined text-xl">mail</span>
+              이메일로 전송하기
+            </button>
+            {!customerEmail && (
+              <p className="font-body-md text-xs text-on-surface-variant px-1">
+                프리미엄 결제 시 입력한 이메일로 전송돼요. 아직 결제 내역이 없어요.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+            {emailStatus === 'sent' ? (
+              <p className="font-label-bold text-label-bold text-secondary text-center py-sm">
+                이메일로 전송했어요!
+              </p>
+            ) : (
+              <>
+                <p className="font-body-md text-body-md text-on-surface">
+                  <span className="font-label-bold text-primary">{customerEmail}</span>으로
+                  전송할까요?
+                </p>
+                <p className="font-body-md text-xs text-on-surface-variant">
+                  결제 시 입력하신 이메일 주소로만 전송돼요.
+                </p>
+                {emailStatus === 'error' && emailError && (
+                  <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+                    {emailError}
+                  </div>
+                )}
+                <div className="flex gap-sm justify-end">
+                  <button
+                    className="font-label-bold text-label-bold text-on-surface-variant py-sm px-md rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                    onClick={handleCancelEmailForm}
+                    disabled={emailStatus === 'sending'}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="btn-primary bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                    onClick={handleSendEmail}
+                    disabled={emailStatus === 'sending'}
+                  >
+                    {emailStatus === 'sending' ? '보내는 중...' : '보내기'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

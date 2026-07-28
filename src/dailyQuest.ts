@@ -1,3 +1,7 @@
+import { getDayIndex, getTodayDateString, getYesterdayDateString } from './dateUtils'
+
+export { getDayIndex, getTodayDateString, getYesterdayDateString }
+
 const STREAK_KEY = 'soundnative_streak'
 const LAST_PLAYED_KEY = 'soundnative_lastPlayedDate'
 const QUESTION_INDEX_OVERRIDE_KEY = 'soundnative_devQuestionIndexOverride'
@@ -5,29 +9,6 @@ const QUESTION_INDEX_OVERRIDE_KEY = 'soundnative_devQuestionIndexOverride'
 export interface StreakState {
   streak: number
   lastPlayedDate: string | null
-}
-
-function formatDate(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-export function getTodayDateString(): string {
-  return formatDate(new Date())
-}
-
-export function getDayIndex(dateString: string): number {
-  const [year, month, day] = dateString.split('-').map(Number)
-  return Math.floor(Date.UTC(year, month - 1, day) / 86400000)
-}
-
-export function getYesterdayDateString(dateString: string): string {
-  const [year, month, day] = dateString.split('-').map(Number)
-  const date = new Date(Date.UTC(year, month - 1, day))
-  date.setUTCDate(date.getUTCDate() - 1)
-  return formatDate(date)
 }
 
 export function computeNextStreak(prev: StreakState, today: string): number {

@@ -138,6 +138,10 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
                 ? '결제는 Polar가 안전하게 처리합니다. 디지털 구독 콘텐츠이며 언제든지 해지할 수 있어요.'
                 : '결제는 Polar가 안전하게 처리합니다. 일회성 결제이며, 결제 후 바로 이용할 수 있어요.'}
             </p>
+            <p className="font-body-md text-xs text-on-surface-variant text-center">
+              결제 시 입력하신 이메일로 학습 노트를 보내드려요. 이메일 주소를 정확히
+              입력해주세요 — 주소를 잘못 입력해 노트를 받지 못한 경우는 환불 대상이 아니에요.
+            </p>
           </div>
         )}
       </div>
