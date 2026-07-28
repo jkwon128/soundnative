@@ -104,9 +104,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        // TODO: switch to a verified sending domain once one is set up on
-        // Resend — onboarding@resend.dev only works for testing/dev sends.
-        from: 'SoundNative <onboarding@resend.dev>',
+        from: 'SoundNative <notes@soundnative.org>',
         to: [email],
         subject: 'SoundNative — 지금까지 배운 표현 노트',
         html: renderEmailHtml(notes),
