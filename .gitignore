@@ -16,6 +16,10 @@ dist-ssr
 .dev.vars
 .wrangler
 
+# Vite env files (Supabase URL/anon key)
+.env
+.env.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

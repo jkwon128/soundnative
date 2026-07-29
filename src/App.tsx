@@ -12,6 +12,7 @@ import DecodeScreen from './DecodeScreen'
 import NoteScreen from './NoteScreen'
 import PricingScreen from './PricingScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
+import { supabase } from './supabaseClient'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
@@ -44,6 +45,7 @@ function readCheckoutIdFromUrl(): string | null {
 function App() {
   const [checkoutId] = useState<string | null>(readCheckoutIdFromUrl)
   const [screen, setScreen] = useState<Screen>(checkoutId ? 'checkoutSuccess' : 'welcome')
+  const [sessionChecked, setSessionChecked] = useState(false)
   // Held in memory only. Gets merged into the full onboarding profile object
   // (goal/motivation/level/daily goal/profiling) and written to localStorage
   // once the whole onboarding flow is complete — not yet.
@@ -56,6 +58,19 @@ function App() {
   // from the home screen's upgrade card — only the skip/back button copy
   // differs between the two.
   const [pricingContext, setPricingContext] = useState<'onboarding' | 'upgrade'>('onboarding')
+
+  useEffect(() => {
+    // The Supabase client auto-detects a session from the URL (e.g. the
+    // "Confirm email" link's token) before this resolves, so a just-
+    // confirmed or already-logged-in user lands on Home instead of
+    // restarting onboarding from the welcome screen.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session && !checkoutId) {
+        setScreen('home')
+      }
+      setSessionChecked(true)
+    })
+  }, [checkoutId])
 
   useEffect(() => {
     if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency || learningGoal)) {
@@ -71,6 +86,14 @@ function App() {
       )
     }
   }, [userStatus, englishLevel, visitFrequency, learningGoal])
+
+  if (!sessionChecked) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="font-body-md text-body-md text-on-surface-variant">불러오는 중...</div>
+      </div>
+    )
+  }
 
   return (
     <>

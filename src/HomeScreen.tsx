@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { ALL_SESSIONS, type QuestSession } from './questSessions'
 import { CATEGORY_META } from './categoryMeta'
 import { loadStreak } from './dailyQuest'
 import { loadNotes } from './notes'
 import { loadCompletedSessionIds } from './sessionProgress'
+import { supabase } from './supabaseClient'
 import Logo from './Logo'
 
 // Decorative only — not backed by any real currency/reward logic yet.
@@ -44,6 +46,20 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenPricing }: H
   )
   const todayIndex = firstIncompleteIndex === -1 ? ALL_SESSIONS.length : firstIncompleteIndex
 
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUserEmail(data.session?.user.email ?? null)
+    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user.email ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
   const nodeCenterX = (i: number) => PATH_WIDTH / 2 + OFFSET_PATTERN[i % 4] * OFFSET_X
   const nodeCenterY = (i: number) => i * SLOT_HEIGHT + NODE_ZONE / 2
 
@@ -65,6 +81,16 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenPricing }: H
             <span className="material-symbols-outlined text-secondary text-2xl">diamond</span>
             {STATIC_GEM_COUNT}
           </span>
+          {userEmail && (
+            <button
+              className="text-on-surface-variant cursor-pointer"
+              onClick={() => supabase.auth.signOut()}
+              aria-label="로그아웃"
+              title={`${userEmail} — 로그아웃`}
+            >
+              <span className="material-symbols-outlined text-2xl">logout</span>
+            </button>
+          )}
         </div>
       </div>
 

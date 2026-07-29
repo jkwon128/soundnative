@@ -12,6 +12,7 @@
     "pages:preview": "npm run build && wrangler pages dev dist --compatibility-date=2026-07-13"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.9",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
