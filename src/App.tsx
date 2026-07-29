@@ -12,6 +12,7 @@ import DecodeScreen from './DecodeScreen'
 import NoteScreen from './NoteScreen'
 import PricingScreen from './PricingScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
+import MyPageScreen from './MyPageScreen'
 import { supabase } from './supabaseClient'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
@@ -30,6 +31,7 @@ type Screen =
   | 'notes'
   | 'pricing'
   | 'checkoutSuccess'
+  | 'myPage'
 
 // Polar redirects back to `/?checkout_id=...` after a checkout attempt
 // (success or otherwise) — pull that out of the URL once on load rather than
@@ -151,6 +153,7 @@ function App() {
             setPricingContext('upgrade')
             setScreen('pricing')
           }}
+          onOpenMyPage={() => setScreen('myPage')}
         />
       )}
       {screen === 'quest' && activeSession && (
@@ -166,6 +169,9 @@ function App() {
       )}
       {screen === 'checkoutSuccess' && checkoutId && (
         <CheckoutSuccessScreen checkoutId={checkoutId} onDone={() => setScreen('home')} />
+      )}
+      {screen === 'myPage' && (
+        <MyPageScreen onBack={() => setScreen('home')} onLoggedOut={() => setScreen('welcome')} />
       )}
     </>
   )

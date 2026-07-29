@@ -29,9 +29,16 @@ interface HomeScreenProps {
   onOpenDecode: () => void
   onOpenNotes: () => void
   onOpenPricing: () => void
+  onOpenMyPage: () => void
 }
 
-function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenPricing }: HomeScreenProps) {
+function HomeScreen({
+  onOpenQuest,
+  onOpenDecode,
+  onOpenNotes,
+  onOpenPricing,
+  onOpenMyPage,
+}: HomeScreenProps) {
   const streak = loadStreak().streak
   const noteCount = loadNotes().length
 
@@ -84,11 +91,11 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenPricing }: H
           {userEmail && (
             <button
               className="text-on-surface-variant cursor-pointer"
-              onClick={() => supabase.auth.signOut()}
-              aria-label="로그아웃"
-              title={`${userEmail} — 로그아웃`}
+              onClick={onOpenMyPage}
+              aria-label="마이페이지"
+              title={userEmail}
             >
-              <span className="material-symbols-outlined text-2xl">logout</span>
+              <span className="material-symbols-outlined text-2xl">account_circle</span>
             </button>
           )}
         </div>
