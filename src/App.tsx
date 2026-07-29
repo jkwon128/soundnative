@@ -13,6 +13,7 @@ import NoteScreen from './NoteScreen'
 import PricingScreen from './PricingScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
 import MyPageScreen from './MyPageScreen'
+import ResetPasswordScreen from './ResetPasswordScreen'
 import { supabase } from './supabaseClient'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
@@ -32,6 +33,7 @@ type Screen =
   | 'pricing'
   | 'checkoutSuccess'
   | 'myPage'
+  | 'resetPassword'
 
 // Polar redirects back to `/?checkout_id=...` after a checkout attempt
 // (success or otherwise) — pull that out of the URL once on load rather than
@@ -73,6 +75,21 @@ function App() {
       setSessionChecked(true)
     })
   }, [checkoutId])
+
+  useEffect(() => {
+    // Clicking the "reset password" email link lands back here and fires
+    // this event (with a real, usable session) instead of appearing as a
+    // normal sign-in — route to a dedicated "set a new password" screen
+    // rather than dropping the user straight onto Home.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setScreen('resetPassword')
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (import.meta.env.DEV && (userStatus || englishLevel || visitFrequency || learningGoal)) {
@@ -172,6 +189,9 @@ function App() {
       )}
       {screen === 'myPage' && (
         <MyPageScreen onBack={() => setScreen('home')} onLoggedOut={() => setScreen('welcome')} />
+      )}
+      {screen === 'resetPassword' && (
+        <ResetPasswordScreen onDone={() => setScreen('home')} />
       )}
     </>
   )

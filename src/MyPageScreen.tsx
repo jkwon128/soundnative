@@ -30,6 +30,7 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
   const [provider, setProvider] = useState<string | null>(null)
   const [createdAt, setCreatedAt] = useState<string | undefined>(undefined)
 
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordStatus, setPasswordStatus] = useState<PasswordStatus>('idle')
@@ -69,7 +70,15 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
     setPasswordStatus('saving')
     setPasswordError(null)
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    // This project requires the current password to authorize a password
+    // change from an ordinary logged-in session (as opposed to a
+    // PASSWORD_RECOVERY session from the "forgot password" email link,
+    // which is exempt) — without it Supabase rejects the update with
+    // "current_password_required".
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+      current_password: currentPassword,
+    })
     if (error) {
       setPasswordStatus('error')
       setPasswordError(error.message)
@@ -77,6 +86,7 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
     }
 
     setPasswordStatus('saved')
+    setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
     setTimeout(() => setPasswordStatus('idle'), 2000)
@@ -140,6 +150,15 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
           <form className="flex flex-col gap-sm" onSubmit={handleChangePassword}>
             <input
               className="w-full bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors"
+              placeholder="현재 비밀번호"
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={passwordStatus === 'saving'}
+            />
+            <input
+              className="w-full bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors"
               placeholder="새 비밀번호"
               type="password"
               autoComplete="new-password"
@@ -173,7 +192,9 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
             <button
               className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
               type="submit"
-              disabled={passwordStatus === 'saving' || !newPassword || !confirmPassword}
+              disabled={
+                passwordStatus === 'saving' || !currentPassword || !newPassword || !confirmPassword
+              }
             >
               {passwordStatus === 'saving' ? '변경 중...' : '비밀번호 변경'}
             </button>

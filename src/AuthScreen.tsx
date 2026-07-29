@@ -8,6 +8,7 @@ interface AuthScreenProps {
 }
 
 type AuthMode = 'signUp' | 'logIn'
+type ResetStatus = 'idle' | 'sending' | 'sent' | 'error'
 
 function AuthScreen({ onContinue }: AuthScreenProps) {
   const [mode, setMode] = useState<AuthMode>('signUp')
@@ -16,6 +17,11 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmationSent, setConfirmationSent] = useState(false)
+
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetStatus, setResetStatus] = useState<ResetStatus>('idle')
+  const [resetError, setResetError] = useState<string | null>(null)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -54,6 +60,39 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
     setMode((m) => (m === 'signUp' ? 'logIn' : 'signUp'))
     setError(null)
     setConfirmationSent(false)
+  }
+
+  const openForgotPassword = () => {
+    setForgotPasswordMode(true)
+    setResetEmail(email)
+    setResetStatus('idle')
+    setResetError(null)
+  }
+
+  const closeForgotPassword = () => {
+    setForgotPasswordMode(false)
+    setResetStatus('idle')
+    setResetError(null)
+  }
+
+  const handleSendResetEmail = async (e: FormEvent) => {
+    e.preventDefault()
+    if (resetStatus === 'sending') return
+    setResetStatus('sending')
+    setResetError(null)
+
+    // Supabase emails a link back to this origin; clicking it fires a
+    // PASSWORD_RECOVERY auth event that App.tsx listens for to show the
+    // "set a new password" screen.
+    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: window.location.origin,
+    })
+    if (resetErr) {
+      setResetStatus('error')
+      setResetError(resetErr.message)
+      return
+    }
+    setResetStatus('sent')
   }
 
   const handleGoogleLogin = async () => {
@@ -97,6 +136,51 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
             <p className="font-body-md text-body-md text-on-surface">
               가입 확인 이메일을 보냈어요. 메일함에서 링크를 눌러 인증을 완료해주세요.
             </p>
+          </div>
+        ) : forgotPasswordMode ? (
+          <div className="flex flex-col gap-sm w-full mt-2">
+            {resetStatus === 'sent' ? (
+              <div className="bg-secondary-container/20 border border-secondary rounded-lg px-md py-sm text-center">
+                <p className="font-body-md text-body-md text-on-surface">
+                  비밀번호 재설정 이메일을 보냈어요. 메일함에서 링크를 눌러 새 비밀번호를
+                  설정해주세요.
+                </p>
+              </div>
+            ) : (
+              <form className="flex flex-col gap-sm" onSubmit={handleSendResetEmail}>
+                <input
+                  className="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+                  placeholder="이메일 (Email address)"
+                  type="email"
+                  autoComplete="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  disabled={resetStatus === 'sending'}
+                />
+
+                {resetStatus === 'error' && resetError && (
+                  <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+                    {resetError}
+                  </div>
+                )}
+
+                <button
+                  className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex justify-center items-center cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                  type="submit"
+                  disabled={resetStatus === 'sending' || !resetEmail.trim()}
+                >
+                  {resetStatus === 'sending' ? '전송 중...' : '재설정 이메일 보내기'}
+                </button>
+              </form>
+            )}
+
+            <button
+              type="button"
+              className="text-primary font-label-bold text-label-bold text-sm text-center cursor-pointer"
+              onClick={closeForgotPassword}
+            >
+              로그인으로 돌아가기
+            </button>
           </div>
         ) : (
           <div className="flex flex-col gap-sm w-full mt-2">
@@ -155,6 +239,17 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
                 disabled={loading}
                 minLength={6}
               />
+
+              {mode === 'logIn' && (
+                <button
+                  type="button"
+                  className="text-primary font-label-bold text-label-bold text-sm text-right w-fit self-end cursor-pointer"
+                  onClick={openForgotPassword}
+                  disabled={loading}
+                >
+                  비밀번호를 잊으셨나요?
+                </button>
+              )}
 
               {error && (
                 <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
