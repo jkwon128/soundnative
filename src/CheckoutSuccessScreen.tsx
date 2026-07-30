@@ -14,13 +14,21 @@ interface CheckoutSuccessScreenProps {
   onDone: () => void
 }
 
+// `amount === 0` on a completed checkout means the trial deferred the
+// charge — nothing was billed today. See handling below.
+const TRIAL_START_COPY = {
+  icon: 'check_circle',
+  title: '3일 무료 체험이 시작됐어요!',
+  body: '지금 결제된 금액은 없어요. 체험 기간에는 모든 프리미엄 콘텐츠를 이용할 수 있고, 종료일이 다가오면 이메일로 미리 알려드려요.',
+}
+
 const STATUS_COPY: Record<
   CheckoutStatusInfo['status'],
   { icon: string; title: string; body: string }
 > = {
   succeeded: {
     icon: 'check_circle',
-    title: '구매가 완료됐어요!',
+    title: '구독이 시작됐어요!',
     body: '이제 모든 프리미엄 콘텐츠를 이용할 수 있어요.',
   },
   confirmed: {
@@ -74,19 +82,23 @@ function CheckoutSuccessScreen({ checkoutId, onDone }: CheckoutSuccessScreenProp
     }
   }, [checkoutId])
 
-  const copy = info ? STATUS_COPY[info.status] : null
+  const copy = info
+    ? info.status === 'succeeded' && info.amount === 0
+      ? TRIAL_START_COPY
+      : STATUS_COPY[info.status]
+    : null
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-gutter md:p-lg">
-      <div className="w-full max-w-[480px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg flex flex-col items-center text-center gap-sm shadow">
+    <div className="min-h-screen bg-warm-bg flex items-center justify-center p-gutter md:p-lg">
+      <div className="w-full max-w-[480px] bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md md:p-lg flex flex-col items-center text-center gap-sm">
         {error && (
-          <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-body-md text-on-error-container w-full">
+          <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text w-full">
             {error}
           </div>
         )}
 
         {!error && !copy && (
-          <div className="font-body-md text-body-md text-on-surface-variant">확인하는 중...</div>
+          <div className="font-body-md text-body-md text-warm-text-muted">확인하는 중...</div>
         )}
 
         {copy && (
@@ -94,19 +106,19 @@ function CheckoutSuccessScreen({ checkoutId, onDone }: CheckoutSuccessScreenProp
             <span
               className={`material-symbols-outlined text-4xl ${
                 info?.status === 'succeeded' || info?.status === 'confirmed'
-                  ? 'text-secondary'
-                  : 'text-error'
+                  ? 'text-warm-success-text'
+                  : 'text-warm-error-border'
               }`}
             >
               {copy.icon}
             </span>
-            <h1 className="font-headline-md text-headline-md text-on-surface">{copy.title}</h1>
-            <p className="font-body-md text-body-md text-on-surface-variant">{copy.body}</p>
+            <h1 className="font-warm-serif text-headline-md text-warm-text">{copy.title}</h1>
+            <p className="font-body-md text-body-md text-warm-text-muted">{copy.body}</p>
           </>
         )}
 
         <button
-          className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer mt-2"
+          className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer mt-2"
           onClick={onDone}
         >
           홈으로

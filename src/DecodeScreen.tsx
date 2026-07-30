@@ -46,10 +46,10 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-surface flex justify-center p-gutter md:p-lg">
+    <div className="min-h-screen bg-warm-bg flex justify-center p-gutter md:p-lg">
       <div className="w-full max-w-[560px] flex flex-col gap-md py-lg">
         <button
-          className="flex items-center gap-1 text-primary font-label-bold text-label-bold w-fit cursor-pointer"
+          className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold w-fit cursor-pointer"
           onClick={onBack}
         >
           <span className="material-symbols-outlined text-lg">arrow_back</span>
@@ -57,21 +57,21 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
         </button>
 
         <div>
-          <h1 className="font-headline-md text-headline-md text-on-surface">Decode</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <h1 className="font-warm-serif text-headline-md text-warm-text">Decode</h1>
+          <p className="font-body-md text-body-md text-warm-text-muted">
             원어민이 한 말의 진짜 속뜻을 알려드려요
           </p>
         </div>
 
         <textarea
-          className="w-full min-h-24 bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors resize-y"
+          className="w-full min-h-24 bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
           placeholder="e.g. We should grab coffee sometime"
           value={phrase}
           onChange={(e) => setPhrase(e.target.value)}
         />
 
         <button
-          className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+          className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
           onClick={handleDecode}
           disabled={loading || !phrase.trim()}
         >
@@ -79,10 +79,10 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
         </button>
 
         {loading && (
-          <div className="font-body-md text-body-md text-on-surface-variant">분석 중...</div>
+          <div className="font-body-md text-body-md text-warm-text-muted">분석 중...</div>
         )}
         {error && (
-          <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-body-md text-on-error-container">
+          <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text">
             {error}
           </div>
         )}
@@ -97,12 +97,12 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
             ].map((field) => (
               <div
                 key={field.label}
-                className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow"
+                className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md"
               >
-                <div className="font-label-bold text-sm text-on-surface-variant tracking-wide uppercase mb-2">
+                <div className="font-label-bold text-sm text-warm-text-muted tracking-wide uppercase mb-2">
                   {field.label}
                 </div>
-                <div className="font-body-md text-body-md text-on-surface">{field.value}</div>
+                <div className="font-body-md text-body-md text-warm-text">{field.value}</div>
               </div>
             ))}
           </div>

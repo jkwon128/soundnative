@@ -1,4 +1,5 @@
 import { jsonResponse, polarFetch, type PolarEnv } from './_polar'
+import { getUserFromRequest, type SupabaseEnv } from './_supabase'
 
 interface PolarCheckout {
   id: string
@@ -6,10 +7,11 @@ interface PolarCheckout {
 }
 
 // POST /api/checkout — creates a Polar-hosted checkout session for the
-// premium product and hands back the URL to redirect the customer to.
-// Card handling happens entirely on Polar's hosted page; this endpoint never
-// sees payment details.
-export const onRequestPost: PagesFunction<PolarEnv> = async (context) => {
+// premium subscription (trial period is configured on the Product itself in
+// the Polar dashboard, so it applies automatically) and hands back the URL
+// to redirect the customer to. Card handling happens entirely on Polar's
+// hosted page; this endpoint never sees payment details.
+export const onRequestPost: PagesFunction<PolarEnv & SupabaseEnv> = async (context) => {
   const { request, env } = context
 
   if (!env.POLAR_ACCESS_TOKEN || !env.POLAR_PRODUCT_ID) {
@@ -17,6 +19,14 @@ export const onRequestPost: PagesFunction<PolarEnv> = async (context) => {
       { error: 'Server is missing POLAR_ACCESS_TOKEN or POLAR_PRODUCT_ID.' },
       500,
     )
+  }
+
+  // A subscription has to be tied to a logged-in account — otherwise there's
+  // no row to attach entitlement to, and no way for the webhook to know
+  // whose access to unlock.
+  const user = await getUserFromRequest(request, env)
+  if (!user) {
+    return jsonResponse({ error: '로그인이 필요합니다.' }, 401)
   }
 
   const origin = new URL(request.url).origin
@@ -32,6 +42,11 @@ export const onRequestPost: PagesFunction<PolarEnv> = async (context) => {
       body: JSON.stringify({
         products: [env.POLAR_PRODUCT_ID],
         customer_ip_address: customerIpAddress,
+        // Links the Polar customer to our own user id so the webhook can
+        // write the resulting subscription state back to the right row,
+        // and pre-fills/locks the checkout email to the account's email.
+        external_customer_id: user.id,
+        customer_email: user.email ?? undefined,
         // Polar substitutes {CHECKOUT_ID} at redirect time so the success
         // screen can look up the final payment status.
         success_url: `${origin}/?checkout_id={CHECKOUT_ID}`,

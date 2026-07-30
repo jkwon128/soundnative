@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { supabase } from './supabaseClient'
+import useSubscription, { hasAccess } from './useSubscription'
 
 interface PricingInfo {
   name: string
@@ -13,9 +15,16 @@ interface PricingScreenProps {
   skipLabel?: string
 }
 
+const TRIAL_DAYS = 3
+
 const INTERVAL_LABEL: Record<'month' | 'year', string> = {
   month: '월',
   year: '년',
+}
+
+function formatTrialEndDate(): string {
+  const date = new Date(Date.now() + TRIAL_DAYS * 86400000)
+  return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(date)
 }
 
 function formatAmount(amount: number, currency: string): string {
@@ -31,6 +40,14 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
   const [loadError, setLoadError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const subscription = useSubscription()
+  // Polar's trial-abuse protection blocks a second free trial for the same
+  // account anyway — this just makes sure our own copy never promises one
+  // we can't honor. See SUBSCRIPTION_DESIGN.md step 1.
+  const isReturningSubscriber =
+    subscription.status !== 'loading' &&
+    subscription.status !== 'none' &&
+    !hasAccess(subscription.status)
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +75,14 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
     setCheckoutError(null)
 
     try {
-      const response = await fetch('/api/checkout', { method: 'POST' })
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+      if (!token) throw new Error('로그인이 필요합니다.')
+
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
       const data = await response.json()
       if (!response.ok || !data?.url) {
         throw new Error(data?.error || '결제 페이지를 여는 데 실패했습니다.')
@@ -71,10 +95,10 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
   }
 
   return (
-    <div className="min-h-screen bg-surface flex justify-center p-gutter md:p-lg">
+    <div className="min-h-screen bg-warm-bg flex justify-center p-gutter md:p-lg">
       <div className="w-full max-w-[480px] flex flex-col gap-md py-lg">
         <button
-          className="flex items-center gap-1 text-primary font-label-bold text-label-bold w-fit cursor-pointer"
+          className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold w-fit cursor-pointer"
           onClick={onBack}
         >
           <span className="material-symbols-outlined text-lg">arrow_back</span>
@@ -82,63 +106,84 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
         </button>
 
         <div>
-          <h1 className="font-headline-md text-headline-md text-on-surface">프리미엄 이용하기</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <h1 className="font-warm-serif text-headline-md text-warm-text">
+            {!isReturningSubscriber && pricing?.recurringInterval
+              ? `${TRIAL_DAYS}일 무료로 시작하기`
+              : '프리미엄 이용하기'}
+          </h1>
+          <p className="font-body-md text-body-md text-warm-text-muted">
             모든 학습 콘텐츠와 Decode 기능을 제한 없이 이용하세요
           </p>
         </div>
 
         {loadError && (
-          <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-body-md text-on-error-container">
+          <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text">
             {loadError}
           </div>
         )}
 
         {!loadError && !pricing && (
-          <div className="font-body-md text-body-md text-on-surface-variant">
+          <div className="font-body-md text-body-md text-warm-text-muted">
             가격 정보를 불러오는 중...
           </div>
         )}
 
         {pricing && (
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow flex flex-col gap-sm">
-            <div className="font-label-bold text-body-lg text-on-surface">{pricing.name}</div>
+          <div className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex flex-col gap-sm">
+            <div className="font-label-bold text-body-lg text-warm-text">{pricing.name}</div>
             {pricing.description && (
-              <p className="font-body-md text-body-md text-on-surface-variant">
+              <p className="font-body-md text-body-md text-warm-text-muted">
                 {pricing.description}
               </p>
             )}
             <div className="flex items-baseline gap-1">
-              <span className="font-display-lg text-display-lg text-primary">
+              <span className="font-warm-serif text-display-lg text-warm-primary">
                 {formatAmount(pricing.amount, pricing.currency)}
               </span>
               {pricing.recurringInterval && (
-                <span className="font-body-md text-body-md text-on-surface-variant">
+                <span className="font-body-md text-body-md text-warm-text-muted">
                   / {INTERVAL_LABEL[pricing.recurringInterval]}
                 </span>
               )}
             </div>
 
+            {!isReturningSubscriber && pricing.recurringInterval && (
+              // The one line on this screen that has to be impossible to miss:
+              // exactly when and how much gets charged. See
+              // SUBSCRIPTION_DESIGN.md step 1 ("Poka-yoke").
+              <div className="bg-warm-hint-bg border border-warm-hint-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-text">
+                결제 수단을 지금 등록하지만, {TRIAL_DAYS}일 동안은 요금이 청구되지 않아요. 체험
+                종료일({formatTrialEndDate()})부터 위 금액이 자동으로 결제되고, 그 전에 언제든
+                해지하면 결제되지 않아요.
+              </div>
+            )}
+
             <button
-              className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default mt-2"
+              className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted mt-2"
               onClick={handleCheckout}
               disabled={checkoutLoading}
             >
-              {checkoutLoading ? '이동 중...' : pricing.recurringInterval ? '구독하기' : '구매하기'}
+              {checkoutLoading
+                ? '이동 중...'
+                : !isReturningSubscriber && pricing.recurringInterval
+                  ? `${TRIAL_DAYS}일 무료로 시작하기`
+                  : pricing.recurringInterval
+                    ? '구독하기'
+                    : '구매하기'}
             </button>
 
             {checkoutError && (
-              <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-body-md text-on-error-container">
+              <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text">
                 {checkoutError}
               </div>
             )}
 
-            <p className="font-body-md text-xs text-on-surface-variant text-center">
+            <p className="font-body-md text-xs text-warm-text-muted text-center">
               {pricing.recurringInterval
                 ? '결제는 Polar가 안전하게 처리합니다. 디지털 구독 콘텐츠이며 언제든지 해지할 수 있어요.'
                 : '결제는 Polar가 안전하게 처리합니다. 일회성 결제이며, 결제 후 바로 이용할 수 있어요.'}
             </p>
-            <p className="font-body-md text-xs text-on-surface-variant text-center">
+            <p className="font-body-md text-xs text-warm-text-muted text-center">
               결제 시 입력하신 이메일로 학습 노트를 보내드려요. 이메일 주소를 정확히
               입력해주세요 — 주소를 잘못 입력해 노트를 받지 못한 경우는 환불 대상이 아니에요.
             </p>

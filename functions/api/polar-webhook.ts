@@ -1,4 +1,5 @@
 import { jsonResponse, type PolarEnv } from './_polar'
+import { supabaseAdminFetch, type SupabaseEnv } from './_supabase'
 
 // Polar signs webhooks per the Standard Webhooks spec (the same scheme Svix
 // uses): HMAC-SHA256 over `${id}.${timestamp}.${body}`, keyed by the base64
@@ -62,14 +63,70 @@ async function verifySignature(
     .some((sig) => constantTimeEqual(sig, expected))
 }
 
-// POST /api/polar-webhook — receives order/subscription lifecycle events.
-// Persisting entitlements against a user record is intentionally not wired
-// up yet: SoundNative doesn't have a real account/database backend behind
-// AuthScreen (it's currently a dummy screen), so there's no row to attach a
-// subscription status to. Once real accounts exist, `order.paid` /
-// `subscription.active` / `subscription.canceled` / `subscription.revoked`
-// are the events to persist.
-export const onRequestPost: PagesFunction<PolarEnv> = async (context) => {
+// Subset of Polar's Subscription object that we actually persist. Fields
+// are read defensively (optional chaining, no throws on a missing one)
+// since this is an external API's webhook payload, not a type we control.
+interface PolarSubscriptionPayload {
+  id?: string
+  status?: string
+  customer_id?: string
+  customer?: { id?: string; external_id?: string | null }
+  current_period_end?: string | null
+  trial_end?: string | null
+  cancel_at_period_end?: boolean
+}
+
+const SUBSCRIPTION_EVENT_TYPES = new Set([
+  'subscription.created',
+  'subscription.updated',
+  'subscription.active',
+  'subscription.canceled',
+  'subscription.uncanceled',
+  'subscription.past_due',
+  'subscription.revoked',
+])
+
+// Writes the subscription's current state to `subscriptions`, keyed by the
+// Supabase user id we passed as `external_customer_id` at checkout time
+// (see functions/api/checkout.ts). Entitlement is just
+// `status in ('trialing', 'active')` — see src/useSubscription.ts.
+async function persistSubscription(
+  env: SupabaseEnv,
+  data: PolarSubscriptionPayload,
+): Promise<void> {
+  const userId = data.customer?.external_id
+  const polarCustomerId = data.customer_id ?? data.customer?.id
+  if (!userId || !polarCustomerId || !data.id || !data.status) {
+    // Nothing we can attach this to (e.g. a checkout that wasn't tied to a
+    // logged-in account) — safe to skip rather than fail the webhook.
+    return
+  }
+
+  const response = await supabaseAdminFetch(env, '/subscriptions?on_conflict=user_id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify({
+      user_id: userId,
+      polar_customer_id: polarCustomerId,
+      polar_subscription_id: data.id,
+      status: data.status,
+      trial_ends_at: data.status === 'trialing' ? (data.trial_end ?? data.current_period_end ?? null) : null,
+      current_period_end: data.current_period_end ?? null,
+      cancel_at_period_end: data.cancel_at_period_end ?? false,
+      updated_at: new Date().toISOString(),
+    }),
+  })
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => '')
+    console.error('[polar-webhook] Failed to persist subscription:', details)
+  }
+}
+
+// POST /api/polar-webhook — receives order/subscription lifecycle events and
+// mirrors subscription state into Supabase so the app can gate access
+// without calling out to Polar on every page load.
+export const onRequestPost: PagesFunction<PolarEnv & SupabaseEnv> = async (context) => {
   const { request, env } = context
 
   if (!env.POLAR_WEBHOOK_SECRET) {
@@ -90,22 +147,15 @@ export const onRequestPost: PagesFunction<PolarEnv> = async (context) => {
     return jsonResponse({ error: 'Invalid webhook signature.' }, 401)
   }
 
-  let event: { type?: string }
+  let event: { type?: string; data?: PolarSubscriptionPayload }
   try {
     event = JSON.parse(body)
   } catch {
     return jsonResponse({ error: 'Webhook body must be valid JSON.' }, 400)
   }
 
-  switch (event.type) {
-    case 'order.paid':
-    case 'subscription.active':
-    case 'subscription.canceled':
-    case 'subscription.revoked':
-      console.log('[polar-webhook]', event.type)
-      break
-    default:
-      break
+  if (event.type && SUBSCRIPTION_EVENT_TYPES.has(event.type) && event.data) {
+    await persistSubscription(env, event.data)
   }
 
   return jsonResponse({ received: true }, 200)

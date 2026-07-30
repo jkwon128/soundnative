@@ -79,213 +79,237 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center pb-24">
+    <div className="min-h-screen bg-warm-bg flex flex-col items-center pb-24">
       <div className="w-full max-w-[640px] flex flex-col gap-md p-gutter md:p-lg">
         <div className="flex items-center justify-between">
-          <button className="text-on-surface-variant cursor-pointer" onClick={onExit}>
+          <button className="text-warm-text-muted cursor-pointer" onClick={onExit}>
             <span className="material-symbols-outlined">close</span>
           </button>
-          <span className="bg-surface-container-high text-on-surface font-label-bold text-label-bold px-md py-1 rounded-full">
+          <span className="bg-warm-badge-bg text-warm-badge-text font-label-bold text-label-bold px-md py-1 rounded-full">
             Question {index + 1} / {session.questions.length}
           </span>
         </div>
 
-        <div className="h-2 w-full rounded-full bg-surface-container-high overflow-hidden">
+        <div className="h-2 w-full rounded-full bg-warm-badge-bg overflow-hidden">
           <div
-            className="h-full rounded-full bg-secondary"
+            className="h-full rounded-full bg-warm-primary"
             style={{ width: `${((index + 1) / session.questions.length) * 100}%` }}
           />
         </div>
 
-        <div
-          className="bg-surface-container-lowest border border-outline-variant border-l-4 rounded-xl p-md flex flex-col gap-sm"
-          style={{ borderLeftColor: meta.color }}
-        >
-          <div
-            className="flex items-center gap-2 font-label-bold text-label-bold tracking-wide"
-            style={{ color: meta.color }}
-          >
-            <span className="material-symbols-outlined text-xl">{meta.icon}</span>
-            {meta.label.toUpperCase()}
+        <div className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card overflow-hidden">
+          <div className="bg-warm-card-header p-md flex flex-col gap-sm">
+            <span
+              className="flex items-center gap-2 w-fit bg-warm-surface/70 font-label-bold text-label-bold px-md py-1 rounded-full"
+              style={{ color: meta.color }}
+            >
+              <span className="material-symbols-outlined text-lg">{meta.icon}</span>
+              {meta.label}
+            </span>
+
+            <p className="font-body-md text-body-md text-warm-text-muted">{question.situation}</p>
+
+            {question.type !== 'tone' && question.phrase && (
+              <>
+                <h2 className="font-warm-serif text-headline-md text-warm-text">
+                  "{question.phrase}"
+                </h2>
+
+                <button
+                  className="flex items-center gap-sm w-fit cursor-pointer"
+                  onClick={() => speak(question.phrase!)}
+                >
+                  <span className="h-9 w-9 rounded-full bg-warm-surface flex items-center justify-center text-warm-primary">
+                    <span className="material-symbols-outlined text-xl">play_arrow</span>
+                  </span>
+                  <span className="font-body-md text-sm text-warm-text-muted">
+                    Listen to pronunciation
+                  </span>
+                </button>
+              </>
+            )}
           </div>
 
-          <p className="font-body-md text-body-md text-on-surface-variant">{question.situation}</p>
-
-          {question.type !== 'tone' && question.phrase && (
-            <>
-              <h2 className="font-headline-md text-headline-md text-on-surface">
-                "{question.phrase}"
-              </h2>
-
-              <button
-                className="flex items-center gap-sm w-fit cursor-pointer"
-                onClick={() => speak(question.phrase!)}
-              >
-                <span className="h-9 w-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-xl">play_arrow</span>
-                </span>
-                <span className="font-body-md text-sm text-on-surface-variant">
-                  Listen to pronunciation
-                </span>
-              </button>
-            </>
-          )}
-        </div>
-
-        {question.type === 'tone' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
-            {(['A', 'B'] as const).map((label) => {
-              const text = label === 'A' ? question.phraseA : question.phraseB
-              const isSelected = selected === label
-              const showCorrect = status === 'correct' && isSelected
-              const showIncorrect = status === 'incorrect' && isSelected
-              return (
-                <button
-                  key={label}
-                  className={`flex flex-col gap-sm bg-surface-container-lowest border rounded-xl p-md text-left cursor-pointer transition-colors disabled:cursor-default ${
-                    showCorrect
-                      ? 'border-secondary bg-secondary-container/20'
-                      : showIncorrect
-                        ? 'border-error bg-error-container/40'
-                        : 'border-outline-variant hover:border-primary'
-                  }`}
-                  onClick={() => handleSelect(label)}
-                  disabled={status !== 'unanswered'}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`h-7 w-7 shrink-0 rounded-full border-2 flex items-center justify-center font-label-bold text-label-bold ${
+          <div className="p-md flex flex-col gap-sm">
+            {question.type === 'tone' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                {(['A', 'B'] as const).map((label) => {
+                  const text = label === 'A' ? question.phraseA : question.phraseB
+                  const isSelected = selected === label
+                  const showCorrect = status === 'correct' && isSelected
+                  const showIncorrect = status === 'incorrect' && isSelected
+                  return (
+                    <button
+                      key={label}
+                      className={`flex flex-col gap-sm bg-warm-surface border-2 rounded-warm-lg p-md text-left cursor-pointer transition-colors disabled:cursor-default ${
                         showCorrect
-                          ? 'border-secondary bg-secondary text-on-secondary'
+                          ? 'border-warm-success-border bg-warm-success-bg'
                           : showIncorrect
-                            ? 'border-error bg-error text-on-error'
-                            : 'border-outline-variant text-on-surface-variant'
+                            ? 'border-warm-error-border bg-warm-error-bg'
+                            : 'border-warm-border hover:border-warm-primary'
                       }`}
+                      onClick={() => handleSelect(label)}
+                      disabled={status !== 'unanswered'}
                     >
-                      {label}
-                    </span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className="h-8 w-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        speak(text)
-                      }}
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`h-7 w-7 shrink-0 rounded-full border-2 flex items-center justify-center font-label-bold text-label-bold ${
+                            showCorrect
+                              ? 'border-warm-success-border bg-warm-success-border text-warm-on-primary'
+                              : showIncorrect
+                                ? 'border-warm-error-border bg-warm-error-border text-warm-on-primary'
+                                : 'border-warm-border text-warm-text-muted'
+                          }`}
+                        >
+                          {showCorrect ? (
+                            <span className="material-symbols-outlined text-base">check</span>
+                          ) : showIncorrect ? (
+                            <span className="material-symbols-outlined text-base">close</span>
+                          ) : (
+                            label
+                          )}
+                        </span>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          className="h-8 w-8 rounded-full bg-warm-badge-bg flex items-center justify-center text-warm-primary cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            speak(text)
+                          }}
+                        >
+                          <span className="material-symbols-outlined text-lg">play_arrow</span>
+                        </span>
+                      </div>
+                      <span className="font-body-lg text-body-lg text-warm-text">"{text}"</span>
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-sm">
+                {question.choices.map((choice, i) => {
+                  const label = String.fromCharCode(65 + i)
+                  const isSelected = selected === i
+                  const showCorrect = status === 'correct' && isSelected
+                  const showIncorrect = status === 'incorrect' && isSelected
+                  return (
+                    <button
+                      key={i}
+                      className={`flex items-center gap-md bg-warm-surface border-2 rounded-warm-lg px-md py-sm text-left cursor-pointer transition-colors disabled:cursor-default ${
+                        showCorrect
+                          ? 'border-warm-success-border bg-warm-success-bg'
+                          : showIncorrect
+                            ? 'border-warm-error-border bg-warm-error-bg'
+                            : 'border-warm-border hover:border-warm-primary'
+                      }`}
+                      onClick={() => handleSelect(i)}
+                      disabled={status !== 'unanswered'}
                     >
-                      <span className="material-symbols-outlined text-lg">play_arrow</span>
-                    </span>
+                      <span
+                        className={`h-7 w-7 shrink-0 rounded-full border-2 flex items-center justify-center font-label-bold text-label-bold ${
+                          showCorrect
+                            ? 'border-warm-success-border bg-warm-success-border text-warm-on-primary'
+                            : showIncorrect
+                              ? 'border-warm-error-border bg-warm-error-border text-warm-on-primary'
+                              : 'border-warm-border text-warm-text-muted'
+                        }`}
+                      >
+                        {showCorrect ? (
+                          <span className="material-symbols-outlined text-base">check</span>
+                        ) : showIncorrect ? (
+                          <span className="material-symbols-outlined text-base">close</span>
+                        ) : (
+                          label
+                        )}
+                      </span>
+                      <span className="font-body-lg text-body-lg text-warm-text">"{choice}"</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {status === 'correct' && (
+              <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg p-md flex flex-wrap items-start gap-sm">
+                <div>
+                  <div className="font-label-bold text-label-bold text-warm-success-text mb-1">
+                    정답!
                   </div>
-                  <span className="font-body-lg text-body-lg text-on-surface">"{text}"</span>
-                </button>
-              )
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-sm">
-            {question.choices.map((choice, i) => {
-              const isSelected = selected === i
-              const showCorrect = status === 'correct' && isSelected
-              const showIncorrect = status === 'incorrect' && isSelected
-              return (
-                <button
-                  key={i}
-                  className={`flex items-center justify-between gap-md bg-surface-container-lowest border rounded-xl px-md py-sm text-left cursor-pointer transition-colors disabled:cursor-default ${
-                    showCorrect
-                      ? 'border-secondary bg-secondary-container/20'
-                      : showIncorrect
-                        ? 'border-error bg-error-container/40'
-                        : 'border-outline-variant hover:border-primary'
-                  }`}
-                  onClick={() => handleSelect(i)}
-                  disabled={status !== 'unanswered'}
-                >
-                  <span className="font-body-lg text-body-lg text-on-surface">"{choice}"</span>
-                  <span
-                    className={`h-5 w-5 shrink-0 rounded-full border-2 ${
-                      showCorrect
-                        ? 'border-secondary bg-secondary'
-                        : showIncorrect
-                          ? 'border-error bg-error'
-                          : 'border-outline-variant'
-                    }`}
-                  />
-                </button>
-              )
-            })}
-          </div>
-        )}
+                  <p className="flex-1 min-w-[160px] font-body-md text-body-md text-warm-text-muted">
+                    {question.explanation}
+                  </p>
+                </div>
 
-        {status === 'correct' && (
-          <div className="bg-secondary-container/20 border border-secondary rounded-xl p-md flex flex-wrap items-start gap-sm">
-            <p className="flex-1 min-w-[160px] font-body-md text-body-md text-on-surface-variant">
-              {question.explanation}
-            </p>
+                {noteButtonState === 'saved' && (
+                  <button
+                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-text-muted cursor-default"
+                    disabled
+                  >
+                    <span className="material-symbols-outlined text-base text-warm-success-text">
+                      check_circle
+                    </span>
+                    노트에 추가됨
+                  </button>
+                )}
 
-            {noteButtonState === 'saved' && (
-              <button
-                className="flex items-center gap-1 ml-auto shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg py-1 px-sm font-label-bold text-xs text-on-surface-variant cursor-default"
-                disabled
-              >
-                <span className="material-symbols-outlined text-base text-secondary">
-                  check_circle
-                </span>
-                노트에 추가됨
-              </button>
+                {noteButtonState === 'idle' && (
+                  <button
+                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-primary cursor-pointer"
+                    onClick={() => setNoteButtonState('panelOpen')}
+                  >
+                    <span className="material-symbols-outlined text-base">bookmark_add</span>
+                    노트에 추가하기
+                  </button>
+                )}
+              </div>
             )}
 
-            {noteButtonState === 'idle' && (
-              <button
-                className="flex items-center gap-1 ml-auto shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg py-1 px-sm font-label-bold text-xs text-primary cursor-pointer"
-                onClick={() => setNoteButtonState('panelOpen')}
-              >
-                <span className="material-symbols-outlined text-base">bookmark_add</span>
-                노트에 추가하기
-              </button>
+            {status === 'correct' && noteButtonState === 'panelOpen' && (
+              <div className="flex flex-col gap-sm bg-warm-bg-soft border border-warm-border rounded-warm-lg p-md">
+                <div className="flex flex-col gap-1">
+                  <p className="font-warm-serif text-body-lg text-warm-text">
+                    "{getNotePhrase(question)}"
+                  </p>
+                  <p className="font-body-md text-body-md text-warm-text-muted">
+                    {question.explanation}
+                  </p>
+                </div>
+                <textarea
+                  autoFocus
+                  className="w-full min-h-16 bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
+                  placeholder="메모 추가 (선택)"
+                  value={noteMemoDraft}
+                  onChange={(e) => setNoteMemoDraft(e.target.value)}
+                />
+                <div className="flex gap-sm justify-end">
+                  <button
+                    className="font-label-bold text-label-bold text-warm-text-muted py-sm px-md rounded-full cursor-pointer"
+                    onClick={handleCancelNote}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer"
+                    onClick={handleSaveNote}
+                  >
+                    저장
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {status === 'incorrect' && (
+              <div className="bg-warm-hint-bg border border-warm-hint-border rounded-warm-lg p-md">
+                <div className="flex items-center gap-1 font-label-bold text-label-bold text-warm-hint-text mb-1">
+                  <span className="material-symbols-outlined text-lg">lightbulb</span>
+                  힌트
+                </div>
+                <p className="font-body-md text-body-md text-warm-text-muted">{question.hint}</p>
+              </div>
             )}
           </div>
-        )}
-
-        {status === 'correct' && noteButtonState === 'panelOpen' && (
-          <div className="flex flex-col gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
-            <div className="flex flex-col gap-1">
-              <p className="font-headline-md text-body-lg text-on-surface">
-                "{getNotePhrase(question)}"
-              </p>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                {question.explanation}
-              </p>
-            </div>
-            <textarea
-              autoFocus
-              className="w-full min-h-16 bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors resize-y"
-              placeholder="메모 추가 (선택)"
-              value={noteMemoDraft}
-              onChange={(e) => setNoteMemoDraft(e.target.value)}
-            />
-            <div className="flex gap-sm justify-end">
-              <button
-                className="font-label-bold text-label-bold text-on-surface-variant py-sm px-md rounded-lg cursor-pointer"
-                onClick={handleCancelNote}
-              >
-                취소
-              </button>
-              <button
-                className="btn-primary bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer"
-                onClick={handleSaveNote}
-              >
-                저장
-              </button>
-            </div>
-          </div>
-        )}
-
-        {status === 'incorrect' && (
-          <div className="bg-error-container/40 border border-error rounded-xl p-md">
-            <div className="font-label-bold text-label-bold text-on-error-container mb-1">힌트</div>
-            <p className="font-body-md text-body-md text-on-surface-variant">{question.hint}</p>
-          </div>
-        )}
+        </div>
       </div>
 
       <QuizFeedbackFooter status={status} isLastQuestion={isLastQuestion} onClick={handleFooterClick} />

@@ -109,39 +109,39 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-gutter md:p-lg bg-surface">
-      <div className="w-full max-w-[480px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg flex flex-col gap-md md:gap-lg relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-gutter md:p-lg bg-warm-bg">
+      <div className="w-full max-w-[480px] bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md md:p-lg flex flex-col gap-md md:gap-lg relative overflow-hidden">
         <div className="flex items-center gap-xs w-full mb-sm">
           {Array.from({ length: TOTAL_ONBOARDING_STEPS }).map((_, i) => (
-            <div key={i} className="h-2 flex-1 rounded-full bg-primary relative overflow-hidden">
+            <div key={i} className="h-2 flex-1 rounded-full bg-warm-primary relative overflow-hidden">
               <div className="absolute inset-0 bg-white/20" />
             </div>
           ))}
         </div>
 
         <div className="flex flex-col gap-sm text-center">
-          <span className="material-symbols-outlined text-primary text-4xl mb-2 inline-block">
+          <span className="material-symbols-outlined text-warm-primary text-4xl mb-2 inline-block">
             celebration
           </span>
-          <h1 className="font-headline-md text-headline-md text-on-surface">
+          <h1 className="font-headline-md text-headline-md text-warm-text">
             거의 다 왔어요! 진행 상황을 저장하려면 가입해주세요
           </h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <p className="font-body-md text-body-md text-warm-text-muted">
             Almost there! Sign up to save your progress.
           </p>
         </div>
 
         {confirmationSent ? (
-          <div className="bg-secondary-container/20 border border-secondary rounded-lg px-md py-sm text-center">
-            <p className="font-body-md text-body-md text-on-surface">
+          <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg px-md py-sm text-center">
+            <p className="font-body-md text-body-md text-warm-text">
               가입 확인 이메일을 보냈어요. 메일함에서 링크를 눌러 인증을 완료해주세요.
             </p>
           </div>
         ) : forgotPasswordMode ? (
           <div className="flex flex-col gap-sm w-full mt-2">
             {resetStatus === 'sent' ? (
-              <div className="bg-secondary-container/20 border border-secondary rounded-lg px-md py-sm text-center">
-                <p className="font-body-md text-body-md text-on-surface">
+              <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg px-md py-sm text-center">
+                <p className="font-body-md text-body-md text-warm-text">
                   비밀번호 재설정 이메일을 보냈어요. 메일함에서 링크를 눌러 새 비밀번호를
                   설정해주세요.
                 </p>
@@ -149,7 +149,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
             ) : (
               <form className="flex flex-col gap-sm" onSubmit={handleSendResetEmail}>
                 <input
-                  className="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+                  className="w-full bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-lg text-body-lg text-warm-text focus:border-warm-primary focus:ring-0 transition-colors"
                   placeholder="이메일 (Email address)"
                   type="email"
                   autoComplete="email"
@@ -159,13 +159,13 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
                 />
 
                 {resetStatus === 'error' && resetError && (
-                  <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+                  <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-error-text">
                     {resetError}
                   </div>
                 )}
 
                 <button
-                  className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex justify-center items-center cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                  className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full flex justify-center items-center cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
                   type="submit"
                   disabled={resetStatus === 'sending' || !resetEmail.trim()}
                 >
@@ -176,7 +176,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
 
             <button
               type="button"
-              className="text-primary font-label-bold text-label-bold text-sm text-center cursor-pointer"
+              className="text-warm-primary font-label-bold text-label-bold text-sm text-center cursor-pointer"
               onClick={closeForgotPassword}
             >
               로그인으로 돌아가기
@@ -186,7 +186,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
           <div className="flex flex-col gap-sm w-full mt-2">
             <button
               type="button"
-              className="btn-secondary w-full flex items-center justify-center gap-sm bg-surface-container-lowest border border-outline text-on-surface font-label-bold text-label-bold py-sm px-md rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              className="btn-warm-secondary w-full flex items-center justify-center gap-sm bg-warm-surface border border-warm-border text-warm-text font-label-bold text-label-bold py-sm px-md rounded-full hover:bg-warm-bg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
               onClick={handleGoogleLogin}
               disabled={loading}
             >
@@ -212,16 +212,16 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
             </button>
 
             <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-outline-variant" />
-              <span className="flex-shrink-0 mx-4 text-on-surface-variant text-sm font-label-bold">
+              <div className="flex-grow border-t border-warm-border" />
+              <span className="flex-shrink-0 mx-4 text-warm-text-muted text-sm font-label-bold">
                 or
               </span>
-              <div className="flex-grow border-t border-outline-variant" />
+              <div className="flex-grow border-t border-warm-border" />
             </div>
 
             <form className="flex flex-col gap-sm" onSubmit={handleSubmit}>
               <input
-                className="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+                className="w-full bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-lg text-body-lg text-warm-text focus:border-warm-primary focus:ring-0 transition-colors"
                 placeholder="이메일 (Email address)"
                 type="email"
                 autoComplete="email"
@@ -230,7 +230,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
                 disabled={loading}
               />
               <input
-                className="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+                className="w-full bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-lg text-body-lg text-warm-text focus:border-warm-primary focus:ring-0 transition-colors"
                 placeholder="비밀번호 (Password)"
                 type="password"
                 autoComplete={mode === 'signUp' ? 'new-password' : 'current-password'}
@@ -243,7 +243,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
               {mode === 'logIn' && (
                 <button
                   type="button"
-                  className="text-primary font-label-bold text-label-bold text-sm text-right w-fit self-end cursor-pointer"
+                  className="text-warm-primary font-label-bold text-label-bold text-sm text-right w-fit self-end cursor-pointer"
                   onClick={openForgotPassword}
                   disabled={loading}
                 >
@@ -252,13 +252,13 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
               )}
 
               {error && (
-                <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+                <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-error-text">
                   {error}
                 </div>
               )}
 
               <button
-                className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex justify-center items-center cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full flex justify-center items-center cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
                 type="submit"
                 disabled={loading || !email.trim() || !password}
               >
@@ -267,7 +267,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
 
               <button
                 type="button"
-                className="text-primary font-label-bold text-label-bold text-sm text-center cursor-pointer"
+                className="text-warm-primary font-label-bold text-label-bold text-sm text-center cursor-pointer"
                 onClick={toggleMode}
                 disabled={loading}
               >
@@ -281,7 +281,7 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
 
         <div className="mt-2 text-center">
           <button
-            className="text-tertiary font-label-bold text-label-bold hover:text-on-surface underline transition-colors cursor-pointer"
+            className="text-warm-text-muted font-label-bold text-label-bold hover:text-warm-text underline transition-colors cursor-pointer"
             onClick={onContinue}
           >
             나중에 하기 (Do it later)

@@ -94,6 +94,37 @@
   --text-display-lg--line-height: 48px;
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-lg--font-weight: 800;
+
+  /* --- "Warm" design system (landing-page look): cream/terracotta theme
+     used on every screen except HomeScreen. Purely additive — none of the
+     tokens above are touched, so HomeScreen (and anything else still using
+     the blue tokens) renders exactly as before. --- */
+  --color-warm-bg: #fbf1e7;
+  --color-warm-bg-soft: #fdf6ef;
+  --color-warm-surface: #ffffff;
+  --color-warm-border: #ead9c4;
+  --color-warm-text: #2b2117;
+  --color-warm-text-muted: #7a6f63;
+  --color-warm-primary: #e36b4a;
+  --color-warm-primary-dark: #c1512f;
+  --color-warm-on-primary: #ffffff;
+  --color-warm-badge-bg: #f3e1c2;
+  --color-warm-badge-text: #6b4423;
+  --color-warm-success-bg: #e5f3e6;
+  --color-warm-success-border: #4caf6d;
+  --color-warm-success-text: #2e7d46;
+  --color-warm-error-bg: #fbe7e1;
+  --color-warm-error-border: #e0604a;
+  --color-warm-error-text: #b94a34;
+  --color-warm-hint-bg: #fbf0d9;
+  --color-warm-hint-border: #e9ce8e;
+  --color-warm-hint-text: #8a6a1f;
+  --color-warm-peach: #f3b588;
+
+  --font-warm-serif: 'Playfair Display', 'Noto Serif KR', serif;
+
+  --radius-warm-card: 1.5rem;
+  --radius-warm-lg: 1rem;
 }
 
 body {
@@ -141,5 +172,30 @@ body {
   }
   .btn-secondary:active {
     transform: translateY(2px);
+  }
+
+  /* --- Warm theme components --- */
+  .bg-warm-card-header {
+    background: linear-gradient(135deg, var(--color-warm-bg-soft), var(--color-warm-badge-bg));
+  }
+  .shadow-warm-card {
+    box-shadow: 0 10px 28px rgba(107, 68, 35, 0.1);
+  }
+  .btn-warm-primary {
+    transition:
+      transform 0.1s,
+      opacity 0.1s;
+  }
+  .btn-warm-primary:active {
+    transform: scale(0.98);
+  }
+  .btn-warm-primary:disabled {
+    opacity: 0.5;
+  }
+  .btn-warm-secondary {
+    transition: transform 0.1s;
+  }
+  .btn-warm-secondary:active {
+    transform: scale(0.98);
   }
 }

@@ -6,56 +6,60 @@ interface WelcomeScreenProps {
 
 function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-gutter md:p-lg bg-gradient-to-br from-surface to-surface-container-high">
-      <div className="w-full max-w-[560px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg relative overflow-hidden shadow">
-        <span className="material-symbols-outlined absolute top-md left-md text-secondary-fixed-dim text-2xl">
+    <div className="min-h-screen flex items-center justify-center p-gutter md:p-lg bg-warm-bg">
+      <div className="w-full max-w-[560px] bg-warm-surface border border-warm-border rounded-warm-card p-md md:p-lg relative overflow-hidden shadow-warm-card">
+        <span className="material-symbols-outlined absolute top-md left-md text-warm-primary text-2xl">
           graphic_eq
         </span>
 
         <div className="flex flex-col items-center text-center gap-sm pt-lg">
-          <div className="text-primary font-label-bold text-label-bold">SoundNative</div>
+          <div className="flex items-center gap-2 text-warm-primary font-label-bold text-label-bold">
+            <Logo className="h-5 w-5" />
+            SoundNative
+          </div>
 
-          <h1 className="font-display-lg text-display-lg text-on-surface max-w-[420px]">
-            Sound like a native, understand the real meaning.
+          <h1 className="font-warm-serif text-display-lg text-warm-text max-w-[420px]">
+            Sound like a <em className="text-warm-primary not-italic">native</em>, understand the
+            real meaning.
           </h1>
 
-          <p className="font-korean-support text-korean-support text-on-surface-variant">
+          <p className="font-korean-support text-korean-support text-warm-text-muted">
             원어민처럼 소리 내고, 진짜 의미를 이해하세요.
           </p>
 
-          <p className="font-body-md text-body-md text-on-surface-variant max-w-[420px]">
+          <p className="font-body-md text-body-md text-warm-text-muted max-w-[420px]">
             Master the pragmatic meanings of native speakers. Go beyond literal translations and
             grasp the cultural nuance, emotion, and rhythm of real conversations.
           </p>
 
-          <div className="w-full max-w-[420px] aspect-video rounded-xl bg-gradient-to-br from-primary via-primary-container to-secondary-fixed-dim relative overflow-hidden my-sm shadow-lg">
+          <div className="w-full max-w-[420px] aspect-video rounded-warm-lg bg-gradient-to-br from-warm-primary via-warm-primary to-warm-peach relative overflow-hidden my-sm shadow-warm-card">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.28),transparent_65%)]" />
 
-            <span className="material-symbols-outlined absolute top-5 left-7 text-on-primary/25 text-xl">
+            <span className="material-symbols-outlined absolute top-5 left-7 text-warm-on-primary/25 text-xl">
               translate
             </span>
-            <span className="material-symbols-outlined absolute top-6 right-8 text-on-primary/20 text-lg">
+            <span className="material-symbols-outlined absolute top-6 right-8 text-warm-on-primary/20 text-lg">
               chat_bubble
             </span>
-            <span className="material-symbols-outlined absolute bottom-6 right-8 text-on-primary/20 text-lg">
+            <span className="material-symbols-outlined absolute bottom-6 right-8 text-warm-on-primary/20 text-lg">
               language
             </span>
-            <span className="material-symbols-outlined absolute top-1/2 left-5 -translate-y-1/2 text-on-primary/15 text-base">
+            <span className="material-symbols-outlined absolute top-1/2 left-5 -translate-y-1/2 text-warm-on-primary/15 text-base">
               emoji_objects
             </span>
 
             <div className="relative h-full flex flex-col items-center justify-center gap-4">
               <div className="flex items-center gap-4">
                 <span className="h-14 w-14 rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-3xl text-on-primary">
+                  <span className="material-symbols-outlined text-3xl text-warm-on-primary">
                     record_voice_over
                   </span>
                 </span>
-                <span className="material-symbols-outlined text-2xl text-on-primary/60">
+                <span className="material-symbols-outlined text-2xl text-warm-on-primary/60">
                   arrow_forward
                 </span>
                 <span className="h-14 w-14 rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-3xl text-on-primary">
+                  <span className="material-symbols-outlined text-3xl text-warm-on-primary">
                     psychology
                   </span>
                 </span>
@@ -63,25 +67,25 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
               <div className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
                 <Logo className="h-4 w-4" />
-                <span className="font-label-bold text-on-primary text-xs">SoundNative</span>
+                <span className="font-label-bold text-warm-on-primary text-xs">SoundNative</span>
               </div>
             </div>
           </div>
 
           <button
-            className="btn-primary w-full max-w-[320px] bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-full flex items-center justify-center gap-2 cursor-pointer"
+            className="btn-warm-primary w-full max-w-[320px] bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full flex items-center justify-center gap-2 cursor-pointer"
             onClick={onStart}
           >
             시작하기 (Start)
             <span className="material-symbols-outlined text-lg">arrow_forward</span>
           </button>
 
-          <p className="font-body-md text-sm text-on-surface-variant">
+          <p className="font-body-md text-sm text-warm-text-muted">
             No account required to explore.
           </p>
         </div>
 
-        <span className="material-symbols-outlined absolute bottom-md right-md text-outline-variant text-2xl">
+        <span className="material-symbols-outlined absolute bottom-md right-md text-warm-border text-2xl">
           translate
         </span>
       </div>

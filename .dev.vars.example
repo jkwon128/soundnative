@@ -12,3 +12,9 @@ POLAR_WEBHOOK_SECRET=whsec_...
 
 # Resend (https://resend.com) — sends the "email my notes" feature
 RESEND_API_KEY=re_...
+
+# Supabase (server-side) — used to verify a caller's access token and to
+# write subscription rows from the Polar webhook. NOT the anon key from
+# .env — from Settings > API > Project API keys > service_role (secret).
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJ...

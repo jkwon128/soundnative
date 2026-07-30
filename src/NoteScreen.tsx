@@ -91,10 +91,10 @@ function NoteScreen({ onBack }: NoteScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-surface flex justify-center p-gutter md:p-lg">
+    <div className="min-h-screen bg-warm-bg flex justify-center p-gutter md:p-lg">
       <div className="w-full max-w-[560px] flex flex-col gap-md py-lg">
         <button
-          className="flex items-center gap-1 text-primary font-label-bold text-label-bold w-fit cursor-pointer"
+          className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold w-fit cursor-pointer"
           onClick={onBack}
         >
           <span className="material-symbols-outlined text-lg">arrow_back</span>
@@ -102,38 +102,38 @@ function NoteScreen({ onBack }: NoteScreenProps) {
         </button>
 
         <div>
-          <h1 className="font-headline-md text-headline-md text-on-surface">노트</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <h1 className="font-warm-serif text-headline-md text-warm-text">노트</h1>
+          <p className="font-body-md text-body-md text-warm-text-muted">
             지금까지 배운 표현 {notes.length}개
           </p>
         </div>
 
         {!isWriting ? (
           <button
-            className="flex items-center justify-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg py-sm px-md font-label-bold text-label-bold text-primary cursor-pointer"
+            className="flex items-center justify-center gap-2 bg-warm-surface border border-warm-border rounded-full py-sm px-md font-label-bold text-label-bold text-warm-primary cursor-pointer"
             onClick={() => setIsWriting(true)}
           >
             <span className="material-symbols-outlined text-xl">add</span>
             직접 메모 추가
           </button>
         ) : (
-          <div className="flex flex-col gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+          <div className="flex flex-col gap-sm bg-warm-surface border border-warm-border rounded-warm-card p-md">
             <textarea
               autoFocus
-              className="w-full min-h-20 bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-md text-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors resize-y"
+              className="w-full min-h-20 bg-warm-bg-soft border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
               placeholder="배운 표현이나 느낀 점을 자유롭게 적어보세요"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
             <div className="flex gap-sm justify-end">
               <button
-                className="font-label-bold text-label-bold text-on-surface-variant py-sm px-md rounded-lg cursor-pointer"
+                className="font-label-bold text-label-bold text-warm-text-muted py-sm px-md rounded-full cursor-pointer"
                 onClick={handleCancelDraft}
               >
                 취소
               </button>
               <button
-                className="btn-primary bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
                 onClick={handleSaveDraft}
                 disabled={!draft.trim()}
               >
@@ -146,7 +146,7 @@ function NoteScreen({ onBack }: NoteScreenProps) {
         {!isEmailFormOpen ? (
           <div className="flex flex-col gap-1">
             <button
-              className="flex items-center justify-center gap-2 bg-surface-container-lowest border border-outline-variant rounded-lg py-sm px-md font-label-bold text-label-bold text-primary cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+              className="flex items-center justify-center gap-2 bg-warm-surface border border-warm-border rounded-full py-sm px-md font-label-bold text-label-bold text-warm-primary cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
               onClick={handleOpenEmailForm}
               disabled={!canSendEmail}
             >
@@ -154,41 +154,41 @@ function NoteScreen({ onBack }: NoteScreenProps) {
               이메일로 전송하기
             </button>
             {!customerEmail && (
-              <p className="font-body-md text-xs text-on-surface-variant px-1">
+              <p className="font-body-md text-xs text-warm-text-muted px-1">
                 프리미엄 결제 시 입력한 이메일로 전송돼요. 아직 결제 내역이 없어요.
               </p>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+          <div className="flex flex-col gap-sm bg-warm-surface border border-warm-border rounded-warm-card p-md">
             {emailStatus === 'sent' ? (
-              <p className="font-label-bold text-label-bold text-secondary text-center py-sm">
+              <p className="font-label-bold text-label-bold text-warm-success-text text-center py-sm">
                 이메일로 전송했어요!
               </p>
             ) : (
               <>
-                <p className="font-body-md text-body-md text-on-surface">
-                  <span className="font-label-bold text-primary">{customerEmail}</span>으로
+                <p className="font-body-md text-body-md text-warm-text">
+                  <span className="font-label-bold text-warm-primary">{customerEmail}</span>으로
                   전송할까요?
                 </p>
-                <p className="font-body-md text-xs text-on-surface-variant">
+                <p className="font-body-md text-xs text-warm-text-muted">
                   결제 시 입력하신 이메일 주소로만 전송돼요.
                 </p>
                 {emailStatus === 'error' && emailError && (
-                  <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+                  <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-error-text">
                     {emailError}
                   </div>
                 )}
                 <div className="flex gap-sm justify-end">
                   <button
-                    className="font-label-bold text-label-bold text-on-surface-variant py-sm px-md rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                    className="font-label-bold text-label-bold text-warm-text-muted py-sm px-md rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-default"
                     onClick={handleCancelEmailForm}
                     disabled={emailStatus === 'sending'}
                   >
                     취소
                   </button>
                   <button
-                    className="btn-primary bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+                    className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
                     onClick={handleSendEmail}
                     disabled={emailStatus === 'sending'}
                   >
@@ -201,8 +201,8 @@ function NoteScreen({ onBack }: NoteScreenProps) {
         )}
 
         {sortedNotes.length === 0 ? (
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg text-center">
-            <p className="font-body-md text-body-md text-on-surface-variant">
+          <div className="bg-warm-surface border border-warm-border rounded-warm-card p-lg text-center">
+            <p className="font-body-md text-body-md text-warm-text-muted">
               아직 배운 표현이 없어요. 퀘스트를 풀면 여기에 자동으로 쌓여요!
             </p>
           </div>
@@ -210,7 +210,7 @@ function NoteScreen({ onBack }: NoteScreenProps) {
           <div className="flex flex-col gap-md">
             {noteGroups.map((group) => (
               <div key={group.key} className="flex flex-col gap-sm">
-                <h2 className="font-label-bold text-label-bold text-on-surface mt-sm">
+                <h2 className="font-label-bold text-label-bold text-warm-text mt-sm">
                   {group.label}
                 </h2>
 
@@ -222,15 +222,15 @@ function NoteScreen({ onBack }: NoteScreenProps) {
                     return (
                       <div
                         key={note.id}
-                        className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow flex flex-col gap-sm"
+                        className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex flex-col gap-sm"
                       >
                         <div className="flex items-center justify-between gap-sm">
                           <div className="flex items-center gap-2">
                             <span
                               className={`font-label-bold text-xs px-2 py-0.5 rounded-full ${
                                 note.type === 'auto'
-                                  ? 'bg-secondary-container/40 text-on-secondary-container'
-                                  : 'bg-primary-fixed text-on-primary-fixed-variant'
+                                  ? 'bg-warm-success-bg text-warm-success-text'
+                                  : 'bg-warm-badge-bg text-warm-badge-text'
                               }`}
                             >
                               {note.type === 'auto' ? '자동' : '메모'}
@@ -248,7 +248,7 @@ function NoteScreen({ onBack }: NoteScreenProps) {
                             )}
                           </div>
                           <button
-                            className="text-on-surface-variant cursor-pointer shrink-0"
+                            className="text-warm-text-muted cursor-pointer shrink-0"
                             onClick={() => handleDelete(note.id)}
                             aria-label="삭제"
                           >
@@ -258,30 +258,30 @@ function NoteScreen({ onBack }: NoteScreenProps) {
 
                         {note.type === 'auto' ? (
                           <div className="flex flex-col gap-1">
-                            <p className="font-headline-md text-body-lg text-on-surface">
+                            <p className="font-warm-serif text-body-lg text-warm-text">
                               "{note.phrase}"
                             </p>
-                            <p className="font-body-md text-body-md text-on-surface-variant">
+                            <p className="font-body-md text-body-md text-warm-text-muted">
                               {note.meaning}
                             </p>
                             {note.memo && (
-                              <div className="mt-1 pt-2 border-t border-outline-variant flex flex-col gap-0.5">
-                                <span className="font-label-bold text-xs text-primary">
+                              <div className="mt-1 pt-2 border-t border-warm-border flex flex-col gap-0.5">
+                                <span className="font-label-bold text-xs text-warm-primary">
                                   내 메모
                                 </span>
-                                <p className="font-body-md text-body-md text-on-surface whitespace-pre-wrap">
+                                <p className="font-body-md text-body-md text-warm-text whitespace-pre-wrap">
                                   {note.memo}
                                 </p>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <p className="font-body-md text-body-md text-on-surface whitespace-pre-wrap">
+                          <p className="font-body-md text-body-md text-warm-text whitespace-pre-wrap">
                             {note.content}
                           </p>
                         )}
 
-                        <span className="font-body-md text-xs text-on-surface-variant">
+                        <span className="font-body-md text-xs text-warm-text-muted">
                           {formatDate(note.createdAt)}
                         </span>
                       </div>

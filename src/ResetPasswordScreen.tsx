@@ -45,26 +45,26 @@ function ResetPasswordScreen({ onDone }: ResetPasswordScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-gutter md:p-lg bg-surface">
-      <div className="w-full max-w-[480px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg flex flex-col gap-md">
+    <div className="min-h-screen flex flex-col items-center justify-center p-gutter md:p-lg bg-warm-bg">
+      <div className="w-full max-w-[480px] bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md md:p-lg flex flex-col gap-md">
         <div className="flex flex-col gap-sm text-center">
-          <span className="material-symbols-outlined text-primary text-4xl mb-2 inline-block">
+          <span className="material-symbols-outlined text-warm-primary text-4xl mb-2 inline-block">
             lock_reset
           </span>
-          <h1 className="font-headline-md text-headline-md text-on-surface">새 비밀번호 설정</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <h1 className="font-headline-md text-headline-md text-warm-text">새 비밀번호 설정</h1>
+          <p className="font-body-md text-body-md text-warm-text-muted">
             새로 사용할 비밀번호를 입력해주세요.
           </p>
         </div>
 
         {status === 'saved' ? (
-          <div className="bg-secondary-container/20 border border-secondary rounded-lg px-md py-sm text-center">
-            <p className="font-body-md text-body-md text-on-surface">비밀번호가 변경됐어요!</p>
+          <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg px-md py-sm text-center">
+            <p className="font-body-md text-body-md text-warm-text">비밀번호가 변경됐어요!</p>
           </div>
         ) : (
           <form className="flex flex-col gap-sm" onSubmit={handleSubmit}>
             <input
-              className="w-full bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+              className="w-full bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-lg text-body-lg text-warm-text focus:border-warm-primary focus:ring-0 transition-colors"
               placeholder="새 비밀번호"
               type="password"
               autoComplete="new-password"
@@ -74,7 +74,7 @@ function ResetPasswordScreen({ onDone }: ResetPasswordScreenProps) {
               minLength={6}
             />
             <input
-              className="w-full bg-surface border-2 border-outline-variant rounded-lg px-md py-sm font-body-lg text-body-lg text-on-surface focus:border-primary focus:ring-0 transition-colors"
+              className="w-full bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-lg text-body-lg text-warm-text focus:border-warm-primary focus:ring-0 transition-colors"
               placeholder="새 비밀번호 확인"
               type="password"
               autoComplete="new-password"
@@ -85,13 +85,13 @@ function ResetPasswordScreen({ onDone }: ResetPasswordScreenProps) {
             />
 
             {status === 'error' && error && (
-              <div className="bg-error-container border border-error rounded-lg px-md py-sm font-body-md text-sm text-on-error-container">
+              <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-error-text">
                 {error}
               </div>
             )}
 
             <button
-              className="btn-primary w-full bg-primary text-on-primary font-label-bold text-label-bold py-sm px-md rounded-lg flex justify-center items-center cursor-pointer disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:border-none disabled:cursor-default"
+              className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full flex justify-center items-center cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
               type="submit"
               disabled={status === 'saving' || !newPassword || !confirmPassword}
             >

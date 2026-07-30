@@ -5,6 +5,7 @@ import { loadStreak } from './dailyQuest'
 import { loadNotes } from './notes'
 import { loadCompletedSessionIds } from './sessionProgress'
 import { supabase } from './supabaseClient'
+import type { SubscriptionState } from './useSubscription'
 import Logo from './Logo'
 
 // Decorative only — not backed by any real currency/reward logic yet.
@@ -25,18 +26,31 @@ const BASE_NODE_SIZE = 64
 const TODAY_NODE_SIZE = 88
 
 interface HomeScreenProps {
+  subscription: SubscriptionState
   onOpenQuest: (session: QuestSession) => void
   onOpenDecode: () => void
   onOpenNotes: () => void
-  onOpenPricing: () => void
   onOpenMyPage: () => void
 }
 
+// Real days remaining, rounded up — a trial that ends in 20 hours should
+// still read "D-1", not "D-0", since there's a partial day of access left.
+function daysRemaining(isoDate: string): number {
+  const ms = new Date(isoDate).getTime() - Date.now()
+  return Math.max(0, Math.ceil(ms / 86400000))
+}
+
+function formatKoreanDate(isoDate: string): string {
+  return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(
+    new Date(isoDate),
+  )
+}
+
 function HomeScreen({
+  subscription,
   onOpenQuest,
   onOpenDecode,
   onOpenNotes,
-  onOpenPricing,
   onOpenMyPage,
 }: HomeScreenProps) {
   const streak = loadStreak().streak
@@ -100,6 +114,42 @@ function HomeScreen({
           )}
         </div>
       </div>
+
+      {subscription.status === 'trialing' && subscription.trialEndsAt && (
+        <div className="bg-secondary-container/20 border-b border-secondary px-md md:px-lg py-sm text-center">
+          <p className="font-body-md text-sm text-on-surface">
+            무료 체험 D-{daysRemaining(subscription.trialEndsAt)} · {formatKoreanDate(subscription.trialEndsAt)}
+            부터 자동으로 결제돼요.{' '}
+            <button
+              className="font-label-bold underline cursor-pointer"
+              onClick={onOpenMyPage}
+            >
+              구독 관리
+            </button>
+          </p>
+        </div>
+      )}
+      {subscription.status === 'active' && subscription.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
+        <div className="bg-error-container/40 border-b border-error px-md md:px-lg py-sm text-center">
+          <p className="font-body-md text-sm text-on-surface">
+            {formatKoreanDate(subscription.currentPeriodEnd)}에 구독이 종료돼요. 그 전까지는 계속
+            이용할 수 있어요.
+          </p>
+        </div>
+      )}
+      {subscription.status === 'past_due' && (
+        <div className="bg-error-container/40 border-b border-error px-md md:px-lg py-sm text-center">
+          <p className="font-body-md text-sm text-on-surface">
+            결제에 실패했어요. 계속 이용하려면 결제 수단을 업데이트해주세요.{' '}
+            <button
+              className="font-label-bold underline cursor-pointer"
+              onClick={onOpenMyPage}
+            >
+              결제 수단 업데이트
+            </button>
+          </p>
+        </div>
+      )}
 
       <div className="max-w-[820px] mx-auto flex flex-col md:flex-row items-center md:items-start justify-center gap-lg p-gutter md:p-lg">
         <div className="flex-1 flex justify-center py-lg">
@@ -253,12 +303,14 @@ function HomeScreen({
 
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center flex flex-col items-center gap-sm shadow-[0_10px_28px_rgba(22,26,50,0.08)]">
             <span className="material-symbols-outlined text-primary text-3xl">diamond</span>
-            <p className="font-label-bold text-body-lg text-on-surface">프리미엄으로 업그레이드</p>
+            <p className="font-label-bold text-body-lg text-on-surface">
+              {subscription.status === 'trialing' ? '무료 체험 이용 중' : '프리미엄 이용 중'}
+            </p>
             <button
               className="btn-secondary w-full flex items-center justify-center gap-sm bg-surface-container-lowest border border-outline text-on-surface font-label-bold text-label-bold py-sm px-md rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
-              onClick={onOpenPricing}
+              onClick={onOpenMyPage}
             >
-              프리미엄 보기
+              구독 관리
             </button>
           </div>
         </div>

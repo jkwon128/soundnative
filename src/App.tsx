@@ -15,6 +15,7 @@ import CheckoutSuccessScreen from './CheckoutSuccessScreen'
 import MyPageScreen from './MyPageScreen'
 import ResetPasswordScreen from './ResetPasswordScreen'
 import { supabase } from './supabaseClient'
+import useSubscription, { hasAccess } from './useSubscription'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
@@ -30,7 +31,6 @@ type Screen =
   | 'quest'
   | 'decode'
   | 'notes'
-  | 'pricing'
   | 'checkoutSuccess'
   | 'myPage'
   | 'resetPassword'
@@ -58,10 +58,17 @@ function App() {
   const [visitFrequency, setVisitFrequency] = useState<VisitFrequency | null>(null)
   const [learningGoal, setLearningGoal] = useState<LearningGoal | null>(null)
   const [activeSession, setActiveSession] = useState<QuestSession | null>(null)
-  // Pricing is shown both right after signup (onboarding paywall) and later
-  // from the home screen's upgrade card — only the skip/back button copy
-  // differs between the two.
-  const [pricingContext, setPricingContext] = useState<'onboarding' | 'upgrade'>('onboarding')
+  const subscription = useSubscription()
+
+  useEffect(() => {
+    // Right after a checkout, give the Polar webhook a moment to land before
+    // the user hits "홈으로" — otherwise the entitlement check below can
+    // still see the pre-checkout state and bounce them back to the paywall.
+    if (!checkoutId) return
+    const timer = setTimeout(() => subscription.refetch(), 1500)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutId])
 
   useEffect(() => {
     // The Supabase client auto-detects a session from the URL (e.g. the
@@ -150,26 +157,27 @@ function App() {
           }}
         />
       )}
-      {screen === 'auth' && (
-        <AuthScreen
-          onContinue={() => {
-            setPricingContext('onboarding')
-            setScreen('pricing')
-          }}
-        />
+      {screen === 'auth' && <AuthScreen onContinue={() => setScreen('home')} />}
+      {screen === 'home' && subscription.status === 'loading' && (
+        <div className="min-h-screen bg-surface flex items-center justify-center">
+          <div className="font-body-md text-body-md text-on-surface-variant">불러오는 중...</div>
+        </div>
       )}
-      {screen === 'home' && (
+      {screen === 'home' && subscription.status !== 'loading' && !hasAccess(subscription.status) && (
+        // Not signed up for the trial yet, or the trial/subscription has
+        // ended — every path into "home" funnels through this same check so
+        // there's exactly one place the hard paywall is enforced.
+        <PricingScreen skipLabel="나중에 하기" onBack={() => setScreen('welcome')} />
+      )}
+      {screen === 'home' && hasAccess(subscription.status) && (
         <HomeScreen
+          subscription={subscription}
           onOpenQuest={(session) => {
             setActiveSession(session)
             setScreen('quest')
           }}
           onOpenDecode={() => setScreen('decode')}
           onOpenNotes={() => setScreen('notes')}
-          onOpenPricing={() => {
-            setPricingContext('upgrade')
-            setScreen('pricing')
-          }}
           onOpenMyPage={() => setScreen('myPage')}
         />
       )}
@@ -178,12 +186,6 @@ function App() {
       )}
       {screen === 'decode' && <DecodeScreen onBack={() => setScreen('home')} />}
       {screen === 'notes' && <NoteScreen onBack={() => setScreen('home')} />}
-      {screen === 'pricing' && (
-        <PricingScreen
-          skipLabel={pricingContext === 'onboarding' ? '나중에 하기' : '홈으로'}
-          onBack={() => setScreen('home')}
-        />
-      )}
       {screen === 'checkoutSuccess' && checkoutId && (
         <CheckoutSuccessScreen checkoutId={checkoutId} onDone={() => setScreen('home')} />
       )}
