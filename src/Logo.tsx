@@ -3,13 +3,15 @@ interface LogoProps {
 }
 
 // The SoundNative brand mark — a speech bubble with sound-wave bars,
-// matching public/favicon.svg. Fixed two-tone colors (purple bubble, white
-// bars) so it reads consistently regardless of surrounding background.
+// matching public/favicon.svg. Fixed two-tone colors (terracotta bubble,
+// white bars) so it reads consistently regardless of surrounding
+// background. The viewBox is cropped tight to the artwork (rather than
+// 0 0 32 32) so the mark fills more of its box at small sizes.
 function Logo({ className }: LogoProps) {
   return (
-    <svg viewBox="0 0 32 32" className={className} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="1 2 30 28" className={className} xmlns="http://www.w3.org/2000/svg">
       <path
-        fill="#6C4CF6"
+        fill="#E36B4A"
         d="M10 3h12a8 8 0 0 1 8 8v4a8 8 0 0 1-8 8h-8.2L7 29.4A1.2 1.2 0 0 1 5 28.5V23a8 8 0 0 1-3-6.2V11a8 8 0 0 1 8-8Z"
       />
       <g stroke="#fff" strokeWidth="3" strokeLinecap="round">

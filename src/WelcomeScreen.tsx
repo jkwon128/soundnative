@@ -14,7 +14,7 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
         <div className="flex flex-col items-center text-center gap-sm pt-lg">
           <div className="flex items-center gap-2 text-warm-primary font-label-bold text-label-bold">
-            <Logo className="h-5 w-5" />
+            <Logo className="h-7 w-7" />
             SoundNative
           </div>
 
@@ -66,7 +66,7 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               </div>
 
               <div className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
-                <Logo className="h-4 w-4" />
+                <Logo className="h-5 w-5" />
                 <span className="font-label-bold text-warm-on-primary text-xs">SoundNative</span>
               </div>
             </div>

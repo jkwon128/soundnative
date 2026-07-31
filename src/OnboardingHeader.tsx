@@ -20,7 +20,7 @@ function OnboardingHeader({ step, total, onBack }: OnboardingHeaderProps) {
           </button>
         )}
         <div className="flex items-center gap-2 text-warm-primary font-label-bold text-label-bold">
-          <Logo className="h-6 w-6" />
+          <Logo className="h-8 w-8" />
           SoundNative
         </div>
       </div>
