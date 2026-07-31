@@ -36,16 +36,18 @@ const LEVEL_OPTIONS: LevelOption[] = [
 ]
 
 interface LevelScreenProps {
+  initialValue: EnglishLevel | null
   onNext: (level: EnglishLevel) => void
+  onBack: () => void
 }
 
-function LevelScreen({ onNext }: LevelScreenProps) {
-  const [selected, setSelected] = useState<EnglishLevel | null>(null)
+function LevelScreen({ initialValue, onNext, onBack }: LevelScreenProps) {
+  const [selected, setSelected] = useState<EnglishLevel | null>(initialValue)
 
   return (
     <div className="min-h-screen bg-warm-bg p-gutter md:p-lg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md">
-        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} />
+        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} onBack={onBack} />
 
         <div className="flex flex-col gap-1 mt-sm mb-sm">
           <h1 className="font-warm-serif text-headline-md text-warm-text">

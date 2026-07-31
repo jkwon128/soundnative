@@ -32,16 +32,18 @@ const GOAL_OPTIONS: GoalOption[] = [
 ]
 
 interface GoalScreenProps {
+  initialValue: LearningGoal | null
   onNext: (goal: LearningGoal) => void
+  onBack: () => void
 }
 
-function GoalScreen({ onNext }: GoalScreenProps) {
-  const [selected, setSelected] = useState<LearningGoal | null>(null)
+function GoalScreen({ initialValue, onNext, onBack }: GoalScreenProps) {
+  const [selected, setSelected] = useState<LearningGoal | null>(initialValue)
 
   return (
     <div className="min-h-screen bg-warm-bg p-gutter md:p-lg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md">
-        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} />
+        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} onBack={onBack} />
 
         <div className="flex flex-col gap-1 mt-sm mb-sm">
           <h1 className="font-warm-serif text-headline-md text-warm-text">

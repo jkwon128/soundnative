@@ -127,34 +127,42 @@ function App() {
       {screen === 'teaserQuiz' && <TeaserQuiz onComplete={() => setScreen('status')} />}
       {screen === 'status' && (
         <StatusScreen
+          initialValue={userStatus}
           onNext={(status) => {
             setUserStatus(status)
             setScreen('level')
           }}
+          onBack={() => setScreen('teaserQuiz')}
         />
       )}
       {screen === 'level' && (
         <LevelScreen
+          initialValue={englishLevel}
           onNext={(level) => {
             setEnglishLevel(level)
             setScreen('frequency')
           }}
+          onBack={() => setScreen('status')}
         />
       )}
       {screen === 'frequency' && (
         <FrequencyScreen
+          initialValue={visitFrequency}
           onNext={(frequency) => {
             setVisitFrequency(frequency)
             setScreen('goal')
           }}
+          onBack={() => setScreen('level')}
         />
       )}
       {screen === 'goal' && (
         <GoalScreen
+          initialValue={learningGoal}
           onNext={(goal) => {
             setLearningGoal(goal)
             setScreen('auth')
           }}
+          onBack={() => setScreen('frequency')}
         />
       )}
       {screen === 'auth' && <AuthScreen onContinue={() => setScreen('home')} />}

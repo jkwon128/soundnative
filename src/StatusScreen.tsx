@@ -48,16 +48,18 @@ const STATUS_OPTIONS: StatusOption[] = [
 ]
 
 interface StatusScreenProps {
+  initialValue: UserStatus | null
   onNext: (status: UserStatus) => void
+  onBack: () => void
 }
 
-function StatusScreen({ onNext }: StatusScreenProps) {
-  const [selected, setSelected] = useState<UserStatus | null>(null)
+function StatusScreen({ initialValue, onNext, onBack }: StatusScreenProps) {
+  const [selected, setSelected] = useState<UserStatus | null>(initialValue)
 
   return (
     <div className="min-h-screen bg-warm-bg p-gutter md:p-lg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md">
-        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} />
+        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} onBack={onBack} />
 
         <div className="flex flex-col gap-1 mt-sm mb-sm">
           <h1 className="font-warm-serif text-headline-md text-warm-text">

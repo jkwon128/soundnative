@@ -36,16 +36,18 @@ const FREQUENCY_OPTIONS: FrequencyOption[] = [
 ]
 
 interface FrequencyScreenProps {
+  initialValue: VisitFrequency | null
   onNext: (frequency: VisitFrequency) => void
+  onBack: () => void
 }
 
-function FrequencyScreen({ onNext }: FrequencyScreenProps) {
-  const [selected, setSelected] = useState<VisitFrequency | null>(null)
+function FrequencyScreen({ initialValue, onNext, onBack }: FrequencyScreenProps) {
+  const [selected, setSelected] = useState<VisitFrequency | null>(initialValue)
 
   return (
     <div className="min-h-screen bg-warm-bg p-gutter md:p-lg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md">
-        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} />
+        <OnboardingHeader step={CURRENT_STEP} total={TOTAL_ONBOARDING_STEPS} onBack={onBack} />
 
         <div className="flex flex-col gap-1 mt-sm mb-sm">
           <h1 className="font-warm-serif text-headline-md text-warm-text">
