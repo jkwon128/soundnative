@@ -23,13 +23,9 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             real meaning.
           </h1>
 
-          <p className="font-korean-support text-korean-support text-warm-text-muted">
-            원어민처럼 소리 내고, 진짜 의미를 이해하세요.
-          </p>
-
           <p className="font-body-md text-body-md text-warm-text-muted max-w-[420px]">
-            Master the pragmatic meanings of native speakers. Go beyond literal translations and
-            grasp the cultural nuance, emotion, and rhythm of real conversations.
+            영어는 하는데, 원어민이 하는 말의 속뜻과 톤이 안 잡히시나요? 하루 1분으로 그 감각을
+            만드세요.
           </p>
 
           <div className="w-full max-w-[420px] aspect-video rounded-warm-lg bg-gradient-to-br from-warm-primary via-warm-primary to-warm-peach relative overflow-hidden my-sm shadow-warm-card">
