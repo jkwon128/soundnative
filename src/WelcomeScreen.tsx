@@ -13,7 +13,7 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         </span>
 
         <div className="flex flex-col items-center text-center gap-sm pt-lg">
-          <div className="flex items-center gap-2 text-warm-primary font-label-bold text-label-bold">
+          <div className="flex items-center gap-2 text-warm-primary font-label-bold text-lg font-bold">
             <Logo className="h-7 w-7" />
             SoundNative
           </div>

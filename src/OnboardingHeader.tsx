@@ -19,7 +19,7 @@ function OnboardingHeader({ step, total, onBack }: OnboardingHeaderProps) {
             <span className="material-symbols-outlined text-xl">arrow_back</span>
           </button>
         )}
-        <div className="flex items-center gap-2 text-warm-primary font-label-bold text-label-bold">
+        <div className="flex items-center gap-2 text-warm-primary font-label-bold text-lg font-bold">
           <Logo className="h-8 w-8" />
           SoundNative
         </div>

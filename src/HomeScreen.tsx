@@ -87,7 +87,7 @@ function HomeScreen({
   return (
     <div className="min-h-screen bg-surface bg-soundwave">
       <div className="sticky top-0 z-10 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-md md:px-lg py-sm">
-        <div className="flex items-center gap-2 text-primary font-label-bold text-label-bold">
+        <div className="flex items-center gap-2 text-primary font-label-bold text-lg font-bold">
           <Logo className="h-8 w-8" />
           SoundNative
         </div>
