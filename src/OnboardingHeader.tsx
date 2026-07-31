@@ -9,10 +9,10 @@ interface OnboardingHeaderProps {
 function OnboardingHeader({ step, total, onBack }: OnboardingHeaderProps) {
   return (
     <div className="flex flex-col gap-md">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-center relative">
         {onBack && (
           <button
-            className="-ml-1 text-warm-text-muted hover:text-warm-primary transition-colors cursor-pointer"
+            className="absolute left-0 text-warm-text-muted hover:text-warm-primary transition-colors cursor-pointer"
             onClick={onBack}
             aria-label="뒤로가기"
           >
