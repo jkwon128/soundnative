@@ -4,7 +4,9 @@ import { CATEGORY_META } from './categoryMeta'
 import { computeNextStreak, getTodayDateString, loadStreak, saveStreak } from './dailyQuest'
 import { addAutoNote, getNotePhrase, hasNoteForQuestion } from './notes'
 import { markSessionCompleted } from './sessionProgress'
-import QuizFeedbackFooter, { type AnswerStatus } from './QuizFeedbackFooter'
+import type { AnswerStatus } from './types'
+import AnswerFeedbackCard from './AnswerFeedbackCard'
+import HintFeedbackCard from './HintFeedbackCard'
 
 type NoteButtonState = 'idle' | 'panelOpen' | 'saved'
 
@@ -62,11 +64,6 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
     setNoteMemoDraft('')
   }
 
-  const handleFooterClick = () => {
-    if (status === 'correct') handleNext()
-    else if (status === 'incorrect') handleRetry()
-  }
-
   const handleSaveNote = () => {
     addAutoNote(question, noteMemoDraft)
     setNoteButtonState('saved')
@@ -79,7 +76,7 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-warm-bg flex flex-col items-center pb-24">
+    <div className="min-h-screen bg-warm-bg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md p-gutter md:p-lg">
         <div className="flex items-center justify-between">
           <button className="text-warm-text-muted cursor-pointer" onClick={onExit}>
@@ -231,38 +228,32 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
             )}
 
             {status === 'correct' && (
-              <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg p-md flex flex-wrap items-start gap-sm">
-                <div>
-                  <div className="font-label-bold text-label-bold text-warm-success-text mb-1">
-                    정답!
-                  </div>
-                  <p className="flex-1 min-w-[160px] font-body-md text-body-md text-warm-text-muted">
-                    {question.explanation}
-                  </p>
-                </div>
-
-                {noteButtonState === 'saved' && (
-                  <button
-                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-text-muted cursor-default"
-                    disabled
-                  >
-                    <span className="material-symbols-outlined text-base text-warm-success-text">
-                      check_circle
-                    </span>
-                    노트에 추가됨
-                  </button>
-                )}
-
-                {noteButtonState === 'idle' && (
-                  <button
-                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-primary cursor-pointer"
-                    onClick={() => setNoteButtonState('panelOpen')}
-                  >
-                    <span className="material-symbols-outlined text-base">bookmark_add</span>
-                    노트에 추가하기
-                  </button>
-                )}
-              </div>
+              <AnswerFeedbackCard
+                explanation={question.explanation}
+                buttonLabel={isLastQuestion ? '완료!' : '다음'}
+                onNext={handleNext}
+                headerExtra={
+                  noteButtonState === 'saved' ? (
+                    <button
+                      className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-text-muted cursor-default"
+                      disabled
+                    >
+                      <span className="material-symbols-outlined text-base text-warm-success-text">
+                        check_circle
+                      </span>
+                      노트에 추가됨
+                    </button>
+                  ) : noteButtonState === 'idle' ? (
+                    <button
+                      className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-primary cursor-pointer"
+                      onClick={() => setNoteButtonState('panelOpen')}
+                    >
+                      <span className="material-symbols-outlined text-base">bookmark_add</span>
+                      노트에 추가하기
+                    </button>
+                  ) : undefined
+                }
+              />
             )}
 
             {status === 'correct' && noteButtonState === 'panelOpen' && (
@@ -300,19 +291,11 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
             )}
 
             {status === 'incorrect' && (
-              <div className="bg-warm-hint-bg border border-warm-hint-border rounded-warm-lg p-md">
-                <div className="flex items-center gap-1 font-label-bold text-label-bold text-warm-hint-text mb-1">
-                  <span className="material-symbols-outlined text-lg">lightbulb</span>
-                  힌트
-                </div>
-                <p className="font-body-md text-body-md text-warm-text-muted">{question.hint}</p>
-              </div>
+              <HintFeedbackCard hint={question.hint} onRetry={handleRetry} />
             )}
           </div>
         </div>
       </div>
-
-      <QuizFeedbackFooter status={status} isLastQuestion={isLastQuestion} onClick={handleFooterClick} />
     </div>
   )
 }

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { quizQuestions, type QuizCategory, type QuizQuestion } from './quizData'
 import { CATEGORY_META } from './categoryMeta'
-import QuizFeedbackFooter, { type AnswerStatus } from './QuizFeedbackFooter'
+import type { AnswerStatus } from './types'
+import AnswerFeedbackCard from './AnswerFeedbackCard'
+import HintFeedbackCard from './HintFeedbackCard'
 
 const ALL_CATEGORIES: QuizCategory[] = ['errands', 'doctor', 'work', 'smalltalk', 'school', 'rent']
 const TEASER_SIZE = 3
@@ -68,13 +70,8 @@ function TeaserQuiz({ onComplete }: TeaserQuizProps) {
     setStatus('unanswered')
   }
 
-  const handleFooterClick = () => {
-    if (status === 'correct') handleNext()
-    else if (status === 'incorrect') handleRetry()
-  }
-
   return (
-    <div className="min-h-screen bg-warm-bg flex flex-col items-center pb-24">
+    <div className="min-h-screen bg-warm-bg flex flex-col items-center">
       <div className="w-full max-w-[640px] flex flex-col gap-md p-gutter md:p-lg">
         <div className="flex items-center justify-end">
           <span className="bg-warm-badge-bg text-warm-badge-text font-label-bold text-label-bold px-md py-1 rounded-full">
@@ -223,30 +220,19 @@ function TeaserQuiz({ onComplete }: TeaserQuizProps) {
             )}
 
             {status === 'correct' && (
-              <div className="bg-warm-success-bg border border-warm-success-border rounded-warm-lg p-md">
-                <div className="font-label-bold text-label-bold text-warm-success-text mb-1">
-                  정답!
-                </div>
-                <p className="font-body-md text-body-md text-warm-text-muted">
-                  {question.explanation}
-                </p>
-              </div>
+              <AnswerFeedbackCard
+                explanation={question.explanation}
+                buttonLabel={isLastQuestion ? '완료!' : '다음'}
+                onNext={handleNext}
+              />
             )}
 
             {status === 'incorrect' && (
-              <div className="bg-warm-hint-bg border border-warm-hint-border rounded-warm-lg p-md">
-                <div className="flex items-center gap-1 font-label-bold text-label-bold text-warm-hint-text mb-1">
-                  <span className="material-symbols-outlined text-lg">lightbulb</span>
-                  힌트
-                </div>
-                <p className="font-body-md text-body-md text-warm-text-muted">{question.hint}</p>
-              </div>
+              <HintFeedbackCard hint={question.hint} onRetry={handleRetry} />
             )}
           </div>
         </div>
       </div>
-
-      <QuizFeedbackFooter status={status} isLastQuestion={isLastQuestion} onClick={handleFooterClick} />
     </div>
   )
 }
