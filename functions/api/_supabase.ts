@@ -50,6 +50,11 @@ export async function getUserFromRequest(
 // PostgREST request against the service role — bypasses RLS. Used for the
 // one write path that has no user session to authorize against (the Polar
 // webhook) and for admin-style upserts.
+//
+// The key goes on `apikey` only — Supabase's new secret keys (sb_secret_...)
+// aren't JWTs, so putting one in `Authorization: Bearer` as well makes the
+// platform try to parse it as a JWT and reject the request with
+// "Invalid JWT". See https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys
 export async function supabaseAdminFetch(
   env: SupabaseEnv,
   path: string,
@@ -60,7 +65,6 @@ export async function supabaseAdminFetch(
     headers: {
       ...init.headers,
       apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
       'content-type': 'application/json',
     },
   })

@@ -16,6 +16,7 @@ import MyPageScreen from './MyPageScreen'
 import ResetPasswordScreen from './ResetPasswordScreen'
 import { supabase } from './supabaseClient'
 import useSubscription, { hasAccess } from './useSubscription'
+import { saveUserProfile, takePendingOnboardingProfile } from './userProfile'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
@@ -50,9 +51,9 @@ function App() {
   const [checkoutId] = useState<string | null>(readCheckoutIdFromUrl)
   const [screen, setScreen] = useState<Screen>(checkoutId ? 'checkoutSuccess' : 'welcome')
   const [sessionChecked, setSessionChecked] = useState(false)
-  // Held in memory only. Gets merged into the full onboarding profile object
-  // (goal/motivation/level/daily goal/profiling) and written to localStorage
-  // once the whole onboarding flow is complete — not yet.
+  // Held in memory during the survey, then saved to the user_profiles table
+  // once signup/login produces a session — see AuthScreen's
+  // saveOnboardingProfile/stashOnboardingProfileForLater.
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null)
   const [englishLevel, setEnglishLevel] = useState<EnglishLevel | null>(null)
   const [visitFrequency, setVisitFrequency] = useState<VisitFrequency | null>(null)
@@ -76,8 +77,18 @@ function App() {
     // confirmed or already-logged-in user lands on Home instead of
     // restarting onboarding from the welcome screen.
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session && !checkoutId) {
-        setScreen('home')
+      if (data.session) {
+        // Picks up onboarding answers stashed before a flow that left this
+        // page (Google OAuth, email confirmation) — see AuthScreen's
+        // stashOnboardingProfileForLater. A no-op if nothing was stashed,
+        // which is the common case (a returning user just opening the app).
+        const pendingProfile = takePendingOnboardingProfile()
+        if (pendingProfile) {
+          void saveUserProfile(data.session.user.id, pendingProfile)
+        }
+        if (!checkoutId) {
+          setScreen('home')
+        }
       }
       setSessionChecked(true)
     })
@@ -165,7 +176,15 @@ function App() {
           onBack={() => setScreen('frequency')}
         />
       )}
-      {screen === 'auth' && <AuthScreen onContinue={() => setScreen('home')} />}
+      {screen === 'auth' && (
+        <AuthScreen
+          userStatus={userStatus}
+          englishLevel={englishLevel}
+          visitFrequency={visitFrequency}
+          learningGoal={learningGoal}
+          onContinue={() => setScreen('home')}
+        />
+      )}
       {screen === 'home' && subscription.status === 'loading' && (
         <div className="min-h-screen bg-surface flex items-center justify-center">
           <div className="font-body-md text-body-md text-on-surface-variant">불러오는 중...</div>

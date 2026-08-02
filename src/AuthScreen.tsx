@@ -1,16 +1,33 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
+import { saveUserProfile, savePendingOnboardingProfile } from './userProfile'
+import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
 
 const TOTAL_ONBOARDING_STEPS = 5
 
 interface AuthScreenProps {
+  // The 5-step onboarding survey's answers, held by App.tsx. Always
+  // non-null by the time this screen is reachable (Status/Level/Frequency/
+  // Goal each require a selection before their "다음" advances) — typed
+  // nullable anyway since that's how App.tsx has to declare the state, and
+  // saving the profile just no-ops if one is somehow missing.
+  userStatus: UserStatus | null
+  englishLevel: EnglishLevel | null
+  visitFrequency: VisitFrequency | null
+  learningGoal: LearningGoal | null
   onContinue: () => void
 }
 
 type AuthMode = 'signUp' | 'logIn'
 type ResetStatus = 'idle' | 'sending' | 'sent' | 'error'
 
-function AuthScreen({ onContinue }: AuthScreenProps) {
+function AuthScreen({
+  userStatus,
+  englishLevel,
+  visitFrequency,
+  learningGoal,
+  onContinue,
+}: AuthScreenProps) {
   const [mode, setMode] = useState<AuthMode>('signUp')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,6 +39,34 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
   const [resetEmail, setResetEmail] = useState('')
   const [resetStatus, setResetStatus] = useState<ResetStatus>('idle')
   const [resetError, setResetError] = useState<string | null>(null)
+
+  // Fires the user_profiles upsert without awaiting it, so a slow or failed
+  // save never delays the screen transition it's called alongside. Only
+  // called once a signup/login has actually produced a session (a user id
+  // to save against, and the session the RLS policy checks).
+  const saveOnboardingProfile = (userId: string) => {
+    if (!userStatus || !englishLevel || !visitFrequency || !learningGoal) return
+    void saveUserProfile(userId, {
+      status: userStatus,
+      englishLevel,
+      visitFrequency,
+      learningGoal,
+    })
+  }
+
+  // For flows that leave this page before a session exists (email
+  // confirmation, Google OAuth) — stash the answers so App.tsx's session
+  // check can save them later once it remounts with a session. See
+  // userProfile.ts's savePendingOnboardingProfile for why this is needed.
+  const stashOnboardingProfileForLater = () => {
+    if (!userStatus || !englishLevel || !visitFrequency || !learningGoal) return
+    savePendingOnboardingProfile({
+      status: userStatus,
+      englishLevel,
+      visitFrequency,
+      learningGoal,
+    })
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -37,16 +82,19 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
         // active session yet — there's nothing to continue into until they
         // click the link in their inbox.
         if (data.session) {
+          saveOnboardingProfile(data.session.user.id)
           onContinue()
         } else {
+          stashOnboardingProfileForLater()
           setConfirmationSent(true)
         }
       } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (signInError) throw signInError
+        saveOnboardingProfile(data.user.id)
         onContinue()
       }
     } catch (err) {
@@ -99,8 +147,9 @@ function AuthScreen({ onContinue }: AuthScreenProps) {
     setError(null)
     // This navigates the browser away to Google's consent screen — on
     // success it lands back on this origin with a session, which
-    // App.tsx's getSession() check on mount picks up. Nothing else to do
-    // here unless kicking off the redirect itself fails.
+    // App.tsx's getSession() check on mount picks up. React remounts from
+    // scratch on the way back, so stash the answers now or they're gone.
+    stashOnboardingProfileForLater()
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },
