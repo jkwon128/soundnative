@@ -90,16 +90,21 @@ const SUBSCRIPTION_EVENT_TYPES = new Set([
 // Supabase user id we passed as `external_customer_id` at checkout time
 // (see functions/api/checkout.ts). Entitlement is just
 // `status in ('trialing', 'active')` — see src/useSubscription.ts.
+//
+// Returns whether the write succeeded, so the caller can tell Polar to
+// retry the delivery on failure — e.g. subscriptions.sql hadn't been run
+// yet once, which silently dropped a real customer's subscription because
+// this used to report success regardless.
 async function persistSubscription(
   env: SupabaseEnv,
   data: PolarSubscriptionPayload,
-): Promise<void> {
+): Promise<boolean> {
   const userId = data.customer?.external_id
   const polarCustomerId = data.customer_id ?? data.customer?.id
   if (!userId || !polarCustomerId || !data.id || !data.status) {
     // Nothing we can attach this to (e.g. a checkout that wasn't tied to a
     // logged-in account) — safe to skip rather than fail the webhook.
-    return
+    return true
   }
 
   const response = await supabaseAdminFetch(env, '/subscriptions?on_conflict=user_id', {
@@ -120,7 +125,9 @@ async function persistSubscription(
   if (!response.ok) {
     const details = await response.text().catch(() => '')
     console.error('[polar-webhook] Failed to persist subscription:', details)
+    return false
   }
+  return true
 }
 
 // POST /api/polar-webhook — receives order/subscription lifecycle events and
@@ -155,7 +162,12 @@ export const onRequestPost: PagesFunction<PolarEnv & SupabaseEnv> = async (conte
   }
 
   if (event.type && SUBSCRIPTION_EVENT_TYPES.has(event.type) && event.data) {
-    await persistSubscription(env, event.data)
+    const persisted = await persistSubscription(env, event.data)
+    if (!persisted) {
+      // A non-2xx tells Polar this delivery failed so it retries later,
+      // instead of the failure getting silently swallowed.
+      return jsonResponse({ error: 'Failed to persist subscription state.' }, 500)
+    }
   }
 
   return jsonResponse({ received: true }, 200)
