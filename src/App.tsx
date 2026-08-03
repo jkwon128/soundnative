@@ -208,7 +208,9 @@ function App() {
       {screen === 'quest' && activeSession && (
         <QuestScreen session={activeSession} onExit={() => setScreen('home')} />
       )}
-      {screen === 'decode' && <DecodeScreen onBack={() => setScreen('home')} />}
+      {screen === 'decode' && (
+        <DecodeScreen onBack={() => setScreen('home')} onOpenNotes={() => setScreen('notes')} />
+      )}
       {screen === 'notes' && <NoteScreen onBack={() => setScreen('home')} />}
       {screen === 'checkoutSuccess' && checkoutId && (
         <CheckoutSuccessScreen checkoutId={checkoutId} onDone={() => setScreen('home')} />

@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { loadStreak } from './dailyQuest'
+import { supabase } from './supabaseClient'
+import HomeLayout from './HomeLayout'
 
 interface DecodeResult {
   literal: string
@@ -9,13 +12,33 @@ interface DecodeResult {
 
 interface DecodeScreenProps {
   onBack: () => void
+  onOpenNotes: () => void
 }
 
-function DecodeScreen({ onBack }: DecodeScreenProps) {
+// Hardcoded per design — not backed by a data file, just a few common
+// phrases to help a first-time user see what to paste in.
+const EXAMPLE_PHRASES = ["You all set?", "I'll look into it.", "That's an interesting point."]
+
+function DecodeScreen({ onBack, onOpenNotes }: DecodeScreenProps) {
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<DecodeResult | null>(null)
+
+  const { streak } = loadStreak()
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUserEmail(data.session?.user.email ?? null)
+    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user.email ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   const handleDecode = async () => {
     if (!phrase.trim() || loading) return
@@ -46,37 +69,70 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-warm-bg flex justify-center p-gutter md:p-lg">
-      <div className="w-full max-w-[560px] flex flex-col gap-md py-lg">
-        <button
-          className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold w-fit cursor-pointer"
-          onClick={onBack}
-        >
-          <span className="material-symbols-outlined text-lg">arrow_back</span>
-          홈으로
-        </button>
+    <HomeLayout
+      activeTab="decode"
+      streak={streak}
+      userEmail={userEmail}
+      onOpenHome={onBack}
+      onOpenDecode={() => {}}
+      onOpenNotes={onOpenNotes}
+    >
+      <div className="w-full max-w-[560px] mx-auto flex flex-col gap-md">
+        <div className="flex items-center gap-sm">
+          <button
+            className="flex items-center gap-1 text-warm-text-muted font-label-bold text-label-bold cursor-pointer"
+            onClick={onBack}
+          >
+            <span className="material-symbols-outlined text-lg">arrow_back</span>홈
+          </button>
+          <span className="bg-warm-badge-bg text-warm-badge-text font-label-bold text-xs tracking-wide uppercase px-md py-1 rounded-full">
+            AI TOOL · DECODE
+          </span>
+        </div>
 
         <div>
-          <h1 className="font-warm-serif text-headline-md text-warm-text">Decode</h1>
-          <p className="font-body-md text-body-md text-warm-text-muted">
-            원어민이 한 말의 진짜 속뜻을 알려드려요
+          <h1 className="font-warm-serif text-headline-md md:text-display-lg text-warm-text">
+            원어민이 한 말,
+            <br />
+            진짜 속뜻은?
+          </h1>
+          <p className="font-body-md text-body-md text-warm-text-muted mt-1">
+            방금 들었거나 받은 영어 문장을 붙여넣으세요.
           </p>
         </div>
 
         <textarea
-          className="w-full min-h-24 bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
-          placeholder="e.g. We should grab coffee sometime"
+          className="w-full min-h-24 bg-warm-surface border border-warm-border rounded-warm-card px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
+          placeholder="예: We should grab coffee sometime!"
           value={phrase}
           onChange={(e) => setPhrase(e.target.value)}
         />
 
         <button
-          className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted"
+          className={`w-full font-label-bold text-label-bold py-sm px-md rounded-full flex items-center justify-center gap-2 cursor-pointer transition-colors ${
+            phrase.trim()
+              ? 'btn-warm-primary bg-warm-primary text-warm-on-primary'
+              : 'bg-warm-primary/40 text-warm-on-primary/90'
+          }`}
           onClick={handleDecode}
           disabled={loading || !phrase.trim()}
         >
           속뜻 보기
+          <span className="material-symbols-outlined text-lg">auto_awesome</span>
         </button>
+
+        <div className="flex flex-col gap-sm">
+          <p className="font-body-md text-sm text-warm-text-muted">이런 문장 자주 나와요</p>
+          {EXAMPLE_PHRASES.map((example) => (
+            <button
+              key={example}
+              className="w-full bg-warm-surface border border-warm-border rounded-2xl px-md py-sm text-left font-body-md text-body-md text-warm-text cursor-pointer"
+              onClick={() => setPhrase(example)}
+            >
+              "{example}"
+            </button>
+          ))}
+        </div>
 
         {loading && (
           <div className="font-body-md text-body-md text-warm-text-muted">분석 중...</div>
@@ -108,7 +164,7 @@ function DecodeScreen({ onBack }: DecodeScreenProps) {
           </div>
         )}
       </div>
-    </div>
+    </HomeLayout>
   )
 }
 

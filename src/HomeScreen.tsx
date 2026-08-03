@@ -79,9 +79,11 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
 
   return (
     <HomeLayout
+      activeTab="today"
       streak={streak}
       userEmail={userEmail}
       onOpenMyPage={onOpenMyPage}
+      onOpenHome={() => {}}
       onOpenDecode={onOpenDecode}
       onOpenNotes={onOpenNotes}
     >
