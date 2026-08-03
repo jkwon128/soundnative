@@ -25,17 +25,23 @@ interface NavCardProps {
 function NavCard({ icon, title, subtitle, onClick }: NavCardProps) {
   return (
     <button
-      className="w-full bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex items-center gap-md text-left cursor-pointer"
+      className="w-full bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex items-center gap-sm text-left cursor-pointer"
       onClick={onClick}
     >
       <span className="h-11 w-11 shrink-0 rounded-full bg-warm-peach/30 flex items-center justify-center text-warm-primary">
         <span className="material-symbols-outlined text-xl">{icon}</span>
       </span>
-      <span className="flex-1">
-        <span className="block font-label-bold text-body-lg text-warm-text">{title}</span>
-        <span className="block font-body-md text-sm text-warm-text-muted">{subtitle}</span>
+      <span className="flex-1 min-w-0">
+        <span className="block font-label-bold text-body-lg text-warm-text text-pretty">
+          {title}
+        </span>
+        <span className="block font-body-md text-sm text-warm-text-muted text-pretty">
+          {subtitle}
+        </span>
       </span>
-      <span className="material-symbols-outlined text-warm-text-muted">chevron_right</span>
+      <span className="material-symbols-outlined text-xl text-warm-text-muted shrink-0">
+        chevron_right
+      </span>
     </button>
   )
 }
