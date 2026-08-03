@@ -2,9 +2,13 @@ import type { QuestSession } from './questSessions'
 import { getNotePhrase } from './notes'
 
 interface QuestPreviewCardProps {
+  // Not-completed: the next session to play. Completed-today: the session
+  // that was just played (see HomeScreen's completedTodaySession) — the two
+  // never both apply, HomeScreen picks the right one to pass in.
   session: QuestSession | undefined
-  playedToday: boolean
+  completedToday: boolean
   onOpen: (session: QuestSession) => void
+  onOpenDecode: () => void
 }
 
 function formatTodayLabel(): string {
@@ -15,7 +19,7 @@ function formatTodayLabel(): string {
   }).format(new Date())
 }
 
-function QuestPreviewCard({ session, playedToday, onOpen }: QuestPreviewCardProps) {
+function QuestPreviewCard({ session, completedToday, onOpen, onOpenDecode }: QuestPreviewCardProps) {
   if (!session) {
     return (
       <div className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex flex-col gap-sm items-center text-center py-lg">
@@ -49,17 +53,36 @@ function QuestPreviewCard({ session, playedToday, onOpen }: QuestPreviewCardProp
         )}
 
         <p className="font-body-md text-body-md text-warm-text-muted">
-          이 말, 진짜 무슨 뜻일까요?
+          {completedToday ? '오늘의 한 문장을 풀었어요.' : '이 말, 진짜 무슨 뜻일까요?'}
         </p>
       </div>
 
-      <button
-        className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md m-md mt-0 rounded-full flex items-center justify-center gap-2 cursor-pointer"
-        onClick={() => onOpen(session)}
-      >
-        {playedToday ? '다음 퀘스트 풀어보기' : '풀어보기 · 1분'}
-        <span className="material-symbols-outlined text-lg">arrow_forward</span>
-      </button>
+      {completedToday ? (
+        <div className="m-md mt-0 bg-warm-success-bg border border-warm-success-border rounded-warm-lg p-md flex flex-col gap-sm">
+          <p className="flex items-center gap-1 font-label-bold text-label-bold text-warm-success-text">
+            <span className="material-symbols-outlined text-lg">check_circle</span>
+            오늘의 퀘스트 완료!
+          </p>
+          <p className="font-body-md text-sm text-warm-text">
+            내일 새로운 문장이 도착해요. 지금 곤란한 표현이 있다면 Decode에 넣어보세요.
+          </p>
+          <button
+            className="w-full bg-warm-surface text-warm-text font-label-bold text-label-bold py-sm px-md rounded-full flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            onClick={onOpenDecode}
+          >
+            <span className="material-symbols-outlined text-lg">auto_awesome</span>
+            Decode 열기
+          </button>
+        </div>
+      ) : (
+        <button
+          className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md m-md mt-0 rounded-full flex items-center justify-center gap-2 cursor-pointer"
+          onClick={() => onOpen(session)}
+        >
+          풀어보기 · 1분
+          <span className="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+      )}
     </div>
   )
 }

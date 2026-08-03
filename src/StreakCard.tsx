@@ -9,7 +9,7 @@ function StreakCard() {
     streak === 0
       ? '오늘 첫 불씨를 붙여볼까요?'
       : playedToday
-        ? '오늘도 해냈어요!'
+        ? '오늘도 지켰어요. 내일 또 만나요 👋'
         : '오늘 한 문장이면 이어져요'
 
   return (

@@ -58,6 +58,13 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
   )
   const todaySession = firstIncompleteIndex === -1 ? undefined : ALL_SESSIONS[firstIncompleteIndex]
 
+  // Sessions are always completed in order via this same progress pointer,
+  // so once something was played today, the one just finished is whichever
+  // sits right before the pointer's current position — no separate
+  // "which session was played today" log needed.
+  const completedPointer = firstIncompleteIndex === -1 ? ALL_SESSIONS.length : firstIncompleteIndex
+  const completedTodaySession = playedToday ? ALL_SESSIONS[completedPointer - 1] : undefined
+
   const notes = loadNotes()
   const noteCount = notes.length
   const now = new Date()
@@ -93,7 +100,12 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
         </div>
 
         <div className="md:col-start-1 md:row-start-1">
-          <QuestPreviewCard session={todaySession} playedToday={playedToday} onOpen={onOpenQuest} />
+          <QuestPreviewCard
+            session={playedToday ? completedTodaySession : todaySession}
+            completedToday={playedToday}
+            onOpen={onOpenQuest}
+            onOpenDecode={onOpenDecode}
+          />
         </div>
 
         <div className="md:col-start-2 md:row-start-2">
