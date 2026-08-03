@@ -96,9 +96,9 @@
   --text-display-lg--font-weight: 800;
 
   /* --- "Warm" design system (landing-page look): cream/terracotta theme
-     used on every screen except HomeScreen. Purely additive — none of the
-     tokens above are touched, so HomeScreen (and anything else still using
-     the blue tokens) renders exactly as before. --- */
+     used across the whole app, including HomeScreen. Purely additive — none
+     of the tokens above are touched, so anything still using the blue
+     tokens renders exactly as before. --- */
   --color-warm-bg: #fbf1e7;
   --color-warm-bg-soft: #fdf6ef;
   --color-warm-surface: #ffffff;

@@ -196,7 +196,6 @@ function App() {
         // subscription status until the streak-based soft paywall replaces
         // this.
         <HomeScreen
-          subscription={subscription}
           onOpenQuest={(session) => {
             setActiveSession(session)
             setScreen('quest')
