@@ -223,7 +223,9 @@ function App() {
       {screen === 'decode' && (
         <DecodeScreen onBack={() => setScreen('home')} onOpenNotes={() => setScreen('notes')} />
       )}
-      {screen === 'notes' && <NoteScreen onBack={() => setScreen('home')} />}
+      {screen === 'notes' && (
+        <NoteScreen onBack={() => setScreen('home')} onOpenDecode={() => setScreen('decode')} />
+      )}
       {screen === 'checkoutSuccess' && checkoutId && (
         <CheckoutSuccessScreen checkoutId={checkoutId} onDone={() => setScreen('home')} />
       )}

@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { loadNotes, addManualNote, deleteNote } from './notes'
 import { CATEGORY_META } from './categoryMeta'
 import { groupNotesByDate, sortNotesNewestFirst } from './noteGrouping'
 import { loadCustomerEmail } from './customerEmail'
+import { loadStreak } from './dailyQuest'
+import { supabase } from './supabaseClient'
+import HomeLayout from './HomeLayout'
 import type { QuizCategory } from './quizData'
 import type { NoteEntry } from './types'
 
 interface NoteScreenProps {
   onBack: () => void
+  onOpenDecode: () => void
 }
 
 type EmailStatus = 'idle' | 'sending' | 'sent' | 'error'
@@ -18,7 +22,7 @@ function formatDate(iso: string): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
 }
 
-function NoteScreen({ onBack }: NoteScreenProps) {
+function NoteScreen({ onBack, onOpenDecode }: NoteScreenProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => loadNotes())
   const [isWriting, setIsWriting] = useState(false)
   const [draft, setDraft] = useState('')
@@ -28,6 +32,21 @@ function NoteScreen({ onBack }: NoteScreenProps) {
   const [emailError, setEmailError] = useState<string | null>(null)
   const customerEmail = loadCustomerEmail()
   const canSendEmail = notes.length > 0 && Boolean(customerEmail)
+
+  const { streak } = loadStreak()
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUserEmail(data.session?.user.email ?? null)
+    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user.email ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   const sortedNotes = sortNotesNewestFirst(notes)
   const noteGroups = groupNotesByDate(sortedNotes)
@@ -91,8 +110,15 @@ function NoteScreen({ onBack }: NoteScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-warm-bg flex justify-center p-gutter md:p-lg">
-      <div className="w-full max-w-[560px] flex flex-col gap-md py-lg">
+    <HomeLayout
+      activeTab="notes"
+      streak={streak}
+      userEmail={userEmail}
+      onOpenHome={onBack}
+      onOpenDecode={onOpenDecode}
+      onOpenNotes={() => {}}
+    >
+      <div className="w-full max-w-[560px] mx-auto flex flex-col gap-md">
         <button
           className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold w-fit cursor-pointer"
           onClick={onBack}
@@ -293,7 +319,7 @@ function NoteScreen({ onBack }: NoteScreenProps) {
           </div>
         )}
       </div>
-    </div>
+    </HomeLayout>
   )
 }
 
