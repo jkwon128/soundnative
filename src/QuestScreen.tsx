@@ -21,9 +21,13 @@ function speak(text: string) {
 interface QuestScreenProps {
   session: QuestSession
   onExit: () => void
+  // Fired instead of onExit when the user finishes the last question (vs.
+  // closing early via the X button) — routes to the one-time celebration
+  // screen rather than straight back to Home.
+  onComplete: () => void
 }
 
-function QuestScreen({ session, onExit }: QuestScreenProps) {
+function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | 'A' | 'B' | null>(null)
   const [status, setStatus] = useState<AnswerStatus>('unanswered')
@@ -53,7 +57,7 @@ function QuestScreen({ session, onExit }: QuestScreenProps) {
       const today = getTodayDateString()
       saveStreak({ streak: computeNextStreak(loadStreak(), today), lastPlayedDate: today })
       markSessionCompleted(session.id)
-      onExit()
+      onComplete()
       return
     }
     const nextQuestion = session.questions[index + 1]

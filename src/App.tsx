@@ -8,6 +8,7 @@ import GoalScreen from './GoalScreen'
 import AuthScreen from './AuthScreen'
 import HomeScreen from './HomeScreen'
 import QuestScreen from './QuestScreen'
+import QuestCompleteScreen from './QuestCompleteScreen'
 import DecodeScreen from './DecodeScreen'
 import NoteScreen from './NoteScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
@@ -30,6 +31,7 @@ type Screen =
   | 'auth'
   | 'home'
   | 'quest'
+  | 'questComplete'
   | 'decode'
   | 'notes'
   | 'checkoutSuccess'
@@ -206,7 +208,17 @@ function App() {
         />
       )}
       {screen === 'quest' && activeSession && (
-        <QuestScreen session={activeSession} onExit={() => setScreen('home')} />
+        <QuestScreen
+          session={activeSession}
+          onExit={() => setScreen('home')}
+          onComplete={() => setScreen('questComplete')}
+        />
+      )}
+      {screen === 'questComplete' && (
+        <QuestCompleteScreen
+          onOpenDecode={() => setScreen('decode')}
+          onOpenHome={() => setScreen('home')}
+        />
       )}
       {screen === 'decode' && (
         <DecodeScreen onBack={() => setScreen('home')} onOpenNotes={() => setScreen('notes')} />
