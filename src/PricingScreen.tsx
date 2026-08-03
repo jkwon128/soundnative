@@ -1,3 +1,6 @@
+// TODO: This screen is currently disconnected from routing (unused in the
+// live app flow). It's slated to be reconnected once the 3-day streak
+// milestone (soft paywall) is implemented. Do not delete until then.
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import useSubscription, { hasAccess } from './useSubscription'

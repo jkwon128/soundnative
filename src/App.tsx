@@ -10,12 +10,12 @@ import HomeScreen from './HomeScreen'
 import QuestScreen from './QuestScreen'
 import DecodeScreen from './DecodeScreen'
 import NoteScreen from './NoteScreen'
-import PricingScreen from './PricingScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
 import MyPageScreen from './MyPageScreen'
 import ResetPasswordScreen from './ResetPasswordScreen'
+import DevPanel from './DevPanel'
 import { supabase } from './supabaseClient'
-import useSubscription, { hasAccess } from './useSubscription'
+import useSubscription from './useSubscription'
 import { saveUserProfile, takePendingOnboardingProfile } from './userProfile'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
@@ -190,13 +190,11 @@ function App() {
           <div className="font-body-md text-body-md text-on-surface-variant">불러오는 중...</div>
         </div>
       )}
-      {screen === 'home' && subscription.status !== 'loading' && !hasAccess(subscription.status) && (
-        // Not signed up for the trial yet, or the trial/subscription has
-        // ended — every path into "home" funnels through this same check so
-        // there's exactly one place the hard paywall is enforced.
-        <PricingScreen skipLabel="나중에 하기" onBack={() => setScreen('welcome')} />
-      )}
-      {screen === 'home' && hasAccess(subscription.status) && (
+      {screen === 'home' && subscription.status !== 'loading' && (
+        // Paywall routing is disconnected for now — see PricingScreen.tsx's
+        // top-of-file TODO. Every signed-in user lands on Home regardless of
+        // subscription status until the streak-based soft paywall replaces
+        // this.
         <HomeScreen
           subscription={subscription}
           onOpenQuest={(session) => {
@@ -222,6 +220,7 @@ function App() {
       {screen === 'resetPassword' && (
         <ResetPasswordScreen onDone={() => setScreen('home')} />
       )}
+      <DevPanel />
     </>
   )
 }
