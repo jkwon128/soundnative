@@ -68,7 +68,7 @@ function HomeLayout({
 
   return (
     <div className="min-h-screen bg-warm-bg pb-24 md:pb-0">
-      <header className="sticky top-0 z-10 bg-warm-bg/95 backdrop-blur border-b border-warm-border flex items-center justify-between px-md md:px-lg py-sm gap-md">
+      <header className="sticky top-0 z-10 bg-warm-bg/95 backdrop-blur border-b border-warm-border grid grid-cols-[1fr_auto_1fr] items-center px-md md:px-lg py-sm gap-md">
         <div className="flex items-center gap-2 text-warm-text font-label-bold text-lg font-bold">
           <Logo className="h-8 w-8" />
           SoundNative
@@ -76,7 +76,7 @@ function HomeLayout({
 
         {renderTabs('header')}
 
-        <div className="flex items-center gap-sm">
+        <div className="flex items-center justify-end gap-sm">
           <span className="flex items-center gap-1 bg-warm-badge-bg text-warm-badge-text font-label-bold text-label-bold px-md py-1 rounded-full">
             <span className="material-symbols-outlined text-lg">local_fire_department</span>
             {streak}
