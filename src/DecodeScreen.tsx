@@ -80,10 +80,10 @@ function DecodeScreen({ onBack, onOpenNotes }: DecodeScreenProps) {
       <div className="w-full max-w-[560px] mx-auto flex flex-col gap-md">
         <div className="flex items-center gap-sm">
           <button
-            className="flex items-center gap-1 text-warm-text-muted font-label-bold text-label-bold cursor-pointer"
+            className="flex items-center gap-1 text-warm-primary font-label-bold text-label-bold cursor-pointer"
             onClick={onBack}
           >
-            <span className="material-symbols-outlined text-lg">arrow_back</span>홈
+            <span className="material-symbols-outlined text-lg">arrow_back</span>홈으로
           </button>
           <span className="bg-warm-badge-bg text-warm-badge-text font-label-bold text-xs tracking-wide uppercase px-md py-1 rounded-full">
             AI TOOL · DECODE
