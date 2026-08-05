@@ -100,12 +100,18 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
       onOpenDecode={onOpenDecode}
       onOpenNotes={onOpenNotes}
     >
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-md items-start">
-        <div className="md:col-start-2 md:row-start-1">
-          <StreakCard />
-        </div>
-
-        <div className="md:col-start-1 md:row-start-1">
+      {/*
+        Desktop splits into two independent-height columns via flex, not a
+        shared grid — a grid row is sized by the tallest item sharing that
+        row across both columns, so a tall QuestPreviewCard (e.g. once
+        today's quest is completed) was stretching the row under StreakCard
+        and leaving a gap before the cards below it. The sidebar wrapper
+        collapses to `contents` on mobile so it doesn't affect the stacked
+        (mobile) order, which stays Streak → Quest → NavCard → NavCard via
+        the `order` values below.
+      */}
+      <div className="flex flex-col md:flex-row gap-md md:items-start">
+        <div className="order-2 md:order-none md:flex-1 md:min-w-0">
           <QuestPreviewCard
             session={playedToday ? completedTodaySession : todaySession}
             completedToday={playedToday}
@@ -114,22 +120,28 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
           />
         </div>
 
-        <div className="md:col-start-2 md:row-start-2">
-          <NavCard
-            icon="auto_awesome"
-            title="지금 급한 말이 있어요"
-            subtitle="원어민이 한 말, 진짜 속뜻 바로 풀기"
-            onClick={onOpenDecode}
-          />
-        </div>
+        <div className="contents md:flex md:flex-col md:gap-md md:w-[320px] md:shrink-0">
+          <div className="order-1">
+            <StreakCard />
+          </div>
 
-        <div className="md:col-start-2 md:row-start-3">
-          <NavCard
-            icon="bookmark_add"
-            title="표현 노트"
-            subtitle={`저장한 표현 ${noteCount}개 · 이번 달 ${notesThisMonth}개`}
-            onClick={onOpenNotes}
-          />
+          <div className="order-3">
+            <NavCard
+              icon="auto_awesome"
+              title="지금 급한 말이 있어요"
+              subtitle="원어민이 한 말, 진짜 속뜻 바로 풀기"
+              onClick={onOpenDecode}
+            />
+          </div>
+
+          <div className="order-4">
+            <NavCard
+              icon="bookmark_add"
+              title="표현 노트"
+              subtitle={`저장한 표현 ${noteCount}개 · 이번 달 ${notesThisMonth}개`}
+              onClick={onOpenNotes}
+            />
+          </div>
         </div>
       </div>
     </HomeLayout>
