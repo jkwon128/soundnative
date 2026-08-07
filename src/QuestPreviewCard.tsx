@@ -52,7 +52,7 @@ function QuestPreviewCard({ session, completedToday, onOpen, onOpenDecode }: Que
           </h2>
         )}
 
-        <p className="font-warm-serif text-body-md text-warm-text-muted">
+        <p className="font-body-md text-body-md text-warm-text-muted">
           {completedToday ? '오늘의 한 문장을 풀었어요.' : '이 말, 진짜 무슨 뜻일까요?'}
         </p>
       </div>
