@@ -42,9 +42,9 @@ function QuestPreviewCard({ session, completedToday, onOpen, onOpenDecode }: Que
       <div className="p-md flex flex-col gap-sm">
         <p className="font-body-md text-sm text-warm-text-muted">{formatTodayLabel()}</p>
 
-        <span className="w-fit bg-warm-badge-bg text-warm-badge-text font-situation-bubble text-situation-bubble px-md py-1 rounded-warm-lg">
+        <p className="text-warm-badge-text font-situation-bubble text-situation-bubble mb-1">
           {question.situation}
-        </span>
+        </p>
 
         {phrase && (
           <h2 className="font-warm-serif text-headline-md md:text-display-lg text-warm-text">
