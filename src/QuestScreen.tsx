@@ -7,6 +7,7 @@ import { markSessionCompleted } from './sessionProgress'
 import type { AnswerStatus } from './types'
 import AnswerFeedbackCard from './AnswerFeedbackCard'
 import HintFeedbackCard from './HintFeedbackCard'
+import RevealFeedbackCard from './RevealFeedbackCard'
 
 type NoteButtonState = 'idle' | 'panelOpen' | 'saved'
 
@@ -31,10 +32,13 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | 'A' | 'B' | null>(null)
   const [status, setStatus] = useState<AnswerStatus>('unanswered')
+  const [attempts, setAttempts] = useState(0)
 
   const question = session.questions[index]
   const isLastQuestion = index === session.questions.length - 1
   const meta = CATEGORY_META[question.category]
+  // tone is a single-attempt reveal; the 3-choice types get one retry (2 attempts total).
+  const maxAttempts = question.type === 'tone' ? 1 : 2
 
   const [noteButtonState, setNoteButtonState] = useState<NoteButtonState>(() =>
     hasNoteForQuestion(question.id) ? 'saved' : 'idle',
@@ -43,8 +47,14 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
 
   const handleSelect = (choice: number | 'A' | 'B') => {
     if (status !== 'unanswered') return
+    const nextAttempts = attempts + 1
+    setAttempts(nextAttempts)
     setSelected(choice)
-    setStatus(choice === question.answer ? 'correct' : 'incorrect')
+    if (choice === question.answer) {
+      setStatus('correct')
+    } else {
+      setStatus(nextAttempts >= maxAttempts ? 'revealed' : 'incorrect')
+    }
   }
 
   const handleRetry = () => {
@@ -64,6 +74,7 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
     setIndex((i) => i + 1)
     setSelected(null)
     setStatus('unanswered')
+    setAttempts(0)
     setNoteButtonState(hasNoteForQuestion(nextQuestion.id) ? 'saved' : 'idle')
     setNoteMemoDraft('')
   }
@@ -137,8 +148,9 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
                 {(['A', 'B'] as const).map((label) => {
                   const text = label === 'A' ? question.phraseA : question.phraseB
                   const isSelected = selected === label
-                  const showCorrect = status === 'correct' && isSelected
-                  const showIncorrect = status === 'incorrect' && isSelected
+                  const isCorrectChoice = label === question.answer
+                  const showCorrect = (status === 'correct' && isSelected) || (status === 'revealed' && isCorrectChoice)
+                  const showIncorrect = (status === 'incorrect' && isSelected) || (status === 'revealed' && isSelected)
                   return (
                     <button
                       key={label}
@@ -192,8 +204,9 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
                 {question.choices.map((choice, i) => {
                   const label = String.fromCharCode(65 + i)
                   const isSelected = selected === i
-                  const showCorrect = status === 'correct' && isSelected
-                  const showIncorrect = status === 'incorrect' && isSelected
+                  const isCorrectChoice = i === question.answer
+                  const showCorrect = (status === 'correct' && isSelected) || (status === 'revealed' && isCorrectChoice)
+                  const showIncorrect = (status === 'incorrect' && isSelected) || (status === 'revealed' && isSelected)
                   return (
                     <button
                       key={i}
@@ -296,6 +309,15 @@ function QuestScreen({ session, onExit, onComplete }: QuestScreenProps) {
 
             {status === 'incorrect' && (
               <HintFeedbackCard hint={question.hint} onRetry={handleRetry} />
+            )}
+
+            {status === 'revealed' && (
+              <RevealFeedbackCard
+                hint={question.type === 'tone' ? question.hint : undefined}
+                explanation={question.explanation}
+                buttonLabel={isLastQuestion ? '완료!' : '다음'}
+                onNext={handleNext}
+              />
             )}
           </div>
         </div>

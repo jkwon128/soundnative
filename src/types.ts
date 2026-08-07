@@ -21,7 +21,9 @@ export type LearningGoal = 'dailyLifeConfidence' | 'nativeConnection' | 'nativeL
 
 // Whether a quiz question has been answered yet, and if so, correctly —
 // shared by TeaserQuiz and QuestScreen (and the feedback cards they render).
-export type AnswerStatus = 'unanswered' | 'correct' | 'incorrect'
+// 'revealed' (out of attempts, correct answer shown) is QuestScreen-only —
+// TeaserQuiz never produces it, so its 'incorrect' handling is unaffected.
+export type AnswerStatus = 'unanswered' | 'correct' | 'incorrect' | 'revealed'
 
 // A single entry in the user's Notes screen — either auto-captured from a
 // correctly-answered quiz question, or freely written by the user.
