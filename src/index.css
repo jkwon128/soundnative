@@ -125,10 +125,10 @@
 
   /* QuestPreviewCard situation bubble only — do not reuse --font-label-bold
      here, that token is shared by 20+ other badges/buttons. */
-  --font-situation-bubble: 'Pretendard', 'Plus Jakarta Sans', sans-serif;
-  --text-situation-bubble: 15px;
-  --text-situation-bubble--line-height: 24px;
-  --text-situation-bubble--font-weight: 600;
+  --font-situation-bubble: 'Playfair Display', 'Noto Serif KR', serif;
+  --text-situation-bubble: 18px;
+  --text-situation-bubble--line-height: 28px;
+  --text-situation-bubble--font-weight: 700;
 
   --radius-warm-card: 1.5rem;
   --radius-warm-lg: 1rem;
