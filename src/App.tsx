@@ -14,9 +14,11 @@ import NoteScreen from './NoteScreen'
 import CheckoutSuccessScreen from './CheckoutSuccessScreen'
 import MyPageScreen from './MyPageScreen'
 import ResetPasswordScreen from './ResetPasswordScreen'
+import PricingScreen from './PricingScreen'
 import DevPanel from './DevPanel'
 import { supabase } from './supabaseClient'
-import useSubscription from './useSubscription'
+import useSubscription, { hasAccess } from './useSubscription'
+import { loadStreak, getTodayDateString } from './dailyQuest'
 import { saveUserProfile, takePendingOnboardingProfile } from './userProfile'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
@@ -37,6 +39,7 @@ type Screen =
   | 'checkoutSuccess'
   | 'myPage'
   | 'resetPassword'
+  | 'pricing'
 
 // Polar redirects back to `/?checkout_id=...` after a checkout attempt
 // (success or otherwise) — pull that out of the URL once on load rather than
@@ -62,6 +65,14 @@ function App() {
   const [learningGoal, setLearningGoal] = useState<LearningGoal | null>(null)
   const [activeSession, setActiveSession] = useState<QuestSession | null>(null)
   const subscription = useSubscription()
+
+  // Soft paywall: the first 3-day streak is a fully free trial. From the
+  // day after hitting streak 3 onward, today's quest is locked unless
+  // subscribed — lastPlayedDate !== today is what distinguishes "just hit
+  // streak 3 today" (still unlocked) from "streak stuck at 3, new day"
+  // (locked), same distinction HomeScreen already uses for playedToday.
+  const { streak, lastPlayedDate } = loadStreak()
+  const isQuestLocked = streak >= 3 && lastPlayedDate !== getTodayDateString() && !hasAccess(subscription.status)
 
   useEffect(() => {
     // Right after a checkout, give the Polar webhook a moment to land before
@@ -198,7 +209,12 @@ function App() {
         // subscription status until the streak-based soft paywall replaces
         // this.
         <HomeScreen
+          isLocked={isQuestLocked}
           onOpenQuest={(session) => {
+            if (isQuestLocked) {
+              setScreen('pricing')
+              return
+            }
             setActiveSession(session)
             setScreen('quest')
           }}
@@ -217,9 +233,14 @@ function App() {
       {screen === 'questComplete' && (
         <QuestCompleteScreen
           onOpenDecode={() => setScreen('decode')}
-          onOpenHome={() => setScreen('home')}
+          // The free trial is exactly the first 3-day streak — right after
+          // hitting it, show the paywall once before returning home. Every
+          // later completion has streak > 3 (paywall already gated getting
+          // there), so this never re-fires.
+          onOpenHome={() => setScreen(streak === 3 ? 'pricing' : 'home')}
         />
       )}
+      {screen === 'pricing' && <PricingScreen onBack={() => setScreen('home')} />}
       {screen === 'decode' && (
         <DecodeScreen onBack={() => setScreen('home')} onOpenNotes={() => setScreen('notes')} />
       )}

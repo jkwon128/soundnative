@@ -7,6 +7,12 @@ interface QuestPreviewCardProps {
   // never both apply, HomeScreen picks the right one to pass in.
   session: QuestSession | undefined
   completedToday: boolean
+  // Soft paywall (streak >= 3, not subscribed, not yet played today) — only
+  // ever true alongside completedToday === false, since the lock only
+  // applies before today's session is played. Purely presentational here:
+  // the click still calls onOpen, and App.tsx's onOpenQuest decides whether
+  // that opens the quest or redirects to the paywall.
+  isLocked: boolean
   onOpen: (session: QuestSession) => void
   onOpenDecode: () => void
 }
@@ -19,7 +25,7 @@ function formatTodayLabel(): string {
   }).format(new Date())
 }
 
-function QuestPreviewCard({ session, completedToday, onOpen, onOpenDecode }: QuestPreviewCardProps) {
+function QuestPreviewCard({ session, completedToday, isLocked, onOpen, onOpenDecode }: QuestPreviewCardProps) {
   if (!session) {
     return (
       <div className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md flex flex-col gap-sm items-center text-center py-lg">
@@ -74,6 +80,14 @@ function QuestPreviewCard({ session, completedToday, onOpen, onOpenDecode }: Que
             Decode 열기
           </button>
         </div>
+      ) : isLocked ? (
+        <button
+          className="bg-warm-badge-bg text-warm-text-muted font-label-bold text-label-bold py-sm px-md m-md mt-0 rounded-full flex items-center justify-center gap-2 cursor-pointer"
+          onClick={() => onOpen(session)}
+        >
+          <span className="material-symbols-outlined text-lg">lock</span>
+          구독 후 이용 가능
+        </button>
       ) : (
         <button
           className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md m-md mt-0 rounded-full flex items-center justify-center gap-2 cursor-pointer"

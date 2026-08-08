@@ -9,6 +9,7 @@ import StreakCard from './StreakCard'
 import QuestPreviewCard from './QuestPreviewCard'
 
 interface HomeScreenProps {
+  isLocked: boolean
   onOpenQuest: (session: QuestSession) => void
   onOpenDecode: () => void
   onOpenNotes: () => void
@@ -51,7 +52,7 @@ function isSameMonth(iso: string, reference: Date): boolean {
   return date.getFullYear() === reference.getFullYear() && date.getMonth() === reference.getMonth()
 }
 
-function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: HomeScreenProps) {
+function HomeScreen({ isLocked, onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: HomeScreenProps) {
   const { streak, lastPlayedDate } = loadStreak()
   const playedToday = lastPlayedDate === getTodayDateString()
 
@@ -115,6 +116,7 @@ function HomeScreen({ onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: Ho
           <QuestPreviewCard
             session={playedToday ? completedTodaySession : todaySession}
             completedToday={playedToday}
+            isLocked={isLocked}
             onOpen={onOpenQuest}
             onOpenDecode={onOpenDecode}
           />
