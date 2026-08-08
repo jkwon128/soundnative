@@ -327,15 +327,6 @@ function AuthScreen({
             </form>
           </div>
         )}
-
-        <div className="mt-2 text-center">
-          <button
-            className="text-warm-text-muted font-label-bold text-label-bold hover:text-warm-text underline transition-colors cursor-pointer"
-            onClick={onContinue}
-          >
-            나중에 하기 (Do it later)
-          </button>
-        </div>
       </div>
     </div>
   )
