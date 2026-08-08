@@ -3,7 +3,6 @@
 // milestone (soft paywall) is implemented. Do not delete until then.
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
-import useSubscription, { hasAccess } from './useSubscription'
 
 interface PricingInfo {
   name: string
@@ -18,16 +17,9 @@ interface PricingScreenProps {
   skipLabel?: string
 }
 
-const TRIAL_DAYS = 3
-
 const INTERVAL_LABEL: Record<'month' | 'year', string> = {
   month: '월',
   year: '년',
-}
-
-function formatTrialEndDate(): string {
-  const date = new Date(Date.now() + TRIAL_DAYS * 86400000)
-  return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(date)
 }
 
 function formatAmount(amount: number, currency: string): string {
@@ -43,14 +35,6 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
   const [loadError, setLoadError] = useState<string | null>(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
-  const subscription = useSubscription()
-  // Polar's trial-abuse protection blocks a second free trial for the same
-  // account anyway — this just makes sure our own copy never promises one
-  // we can't honor. See SUBSCRIPTION_DESIGN.md step 1.
-  const isReturningSubscriber =
-    subscription.status !== 'loading' &&
-    subscription.status !== 'none' &&
-    !hasAccess(subscription.status)
 
   useEffect(() => {
     let cancelled = false
@@ -109,11 +93,7 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
         </button>
 
         <div>
-          <h1 className="font-warm-serif text-headline-md text-warm-text">
-            {!isReturningSubscriber && pricing?.recurringInterval
-              ? `${TRIAL_DAYS}일 무료로 시작하기`
-              : '프리미엄 이용하기'}
-          </h1>
+          <h1 className="font-warm-serif text-headline-md text-warm-text">SoundNative 구독하기</h1>
           <p className="font-body-md text-body-md text-warm-text-muted">
             모든 학습 콘텐츠와 Decode 기능을 제한 없이 이용하세요
           </p>
@@ -150,29 +130,12 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
               )}
             </div>
 
-            {!isReturningSubscriber && pricing.recurringInterval && (
-              // The one line on this screen that has to be impossible to miss:
-              // exactly when and how much gets charged. See
-              // SUBSCRIPTION_DESIGN.md step 1 ("Poka-yoke").
-              <div className="bg-warm-hint-bg border border-warm-hint-border rounded-warm-lg px-md py-sm font-body-md text-sm text-warm-text">
-                결제 수단을 지금 등록하지만, {TRIAL_DAYS}일 동안은 요금이 청구되지 않아요. 체험
-                종료일({formatTrialEndDate()})부터 위 금액이 자동으로 결제되고, 그 전에 언제든
-                해지하면 결제되지 않아요.
-              </div>
-            )}
-
             <button
               className="btn-warm-primary w-full bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer disabled:bg-warm-badge-bg disabled:text-warm-text-muted mt-2"
               onClick={handleCheckout}
               disabled={checkoutLoading}
             >
-              {checkoutLoading
-                ? '이동 중...'
-                : !isReturningSubscriber && pricing.recurringInterval
-                  ? `${TRIAL_DAYS}일 무료로 시작하기`
-                  : pricing.recurringInterval
-                    ? '구독하기'
-                    : '구매하기'}
+              {checkoutLoading ? '이동 중...' : pricing.recurringInterval ? '구독하기' : '구매하기'}
             </button>
 
             {checkoutError && (
