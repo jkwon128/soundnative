@@ -69,3 +69,37 @@ export async function supabaseAdminFetch(
     },
   })
 }
+
+export type SubscriptionAccessStatus =
+  | 'none'
+  | 'incomplete'
+  | 'incomplete_expired'
+  | 'trialing'
+  | 'active'
+  | 'past_due'
+  | 'canceled'
+  | 'unpaid'
+
+// Server-side mirror of src/useSubscription.ts's hasAccess — that file is a
+// React hook (client-only), so this is a small intentional duplicate of its
+// one-line predicate rather than importing React into a Pages Function.
+export function hasAccess(status: SubscriptionAccessStatus): boolean {
+  return status === 'trialing' || status === 'active'
+}
+
+// Looks up a user's current subscription status directly (not via HTTP to
+// /api/subscription-status) — used by endpoints that need to gate on
+// entitlement server-side, e.g. decode.ts's usage cap.
+export async function getSubscriptionStatus(
+  env: SupabaseEnv,
+  userId: string,
+): Promise<SubscriptionAccessStatus> {
+  const response = await supabaseAdminFetch(
+    env,
+    `/subscriptions?user_id=eq.${encodeURIComponent(userId)}&select=status&limit=1`,
+  )
+  if (!response.ok) return 'none'
+
+  const rows = (await response.json().catch(() => [])) as { status?: SubscriptionAccessStatus }[]
+  return rows[0]?.status ?? 'none'
+}

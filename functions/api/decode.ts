@@ -1,6 +1,21 @@
-interface Env {
+import {
+  getSubscriptionStatus,
+  getUserFromRequest,
+  hasAccess,
+  supabaseAdminFetch,
+  type SupabaseEnv,
+} from './_supabase'
+
+interface Env extends SupabaseEnv {
   OPENAI_API_KEY: string
   OPENAI_MODEL?: string
+}
+
+const UNSUBSCRIBED_DAILY_LIMIT = 3
+const SUBSCRIBED_DAILY_LIMIT = 50
+
+function todayUtcDateString(): string {
+  return new Date().toISOString().slice(0, 10)
 }
 
 interface DecodeResult {
@@ -72,6 +87,39 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse({ error: '"phrase" must be a non-empty string.' }, 400)
   }
 
+  const user = await getUserFromRequest(request, env)
+  if (!user) {
+    return jsonResponse({ error: '로그인이 필요합니다.' }, 401)
+  }
+
+  const subscribed = hasAccess(await getSubscriptionStatus(env, user.id))
+  const dailyLimit = subscribed ? SUBSCRIBED_DAILY_LIMIT : UNSUBSCRIBED_DAILY_LIMIT
+  const usageDate = todayUtcDateString()
+
+  const usageResponse = await supabaseAdminFetch(
+    env,
+    `/decode_usage?user_id=eq.${encodeURIComponent(user.id)}&usage_date=eq.${usageDate}&select=count`,
+  )
+  if (!usageResponse.ok) {
+    const details = await usageResponse.text().catch(() => '')
+    return jsonResponse({ error: 'Failed to check usage.', details }, 502)
+  }
+  const usageRows = (await usageResponse.json().catch(() => [])) as { count?: number }[]
+  const usedToday = usageRows[0]?.count ?? 0
+
+  if (usedToday >= dailyLimit) {
+    return jsonResponse(
+      {
+        error: subscribed
+          ? `오늘 Decode 사용 가능 횟수(${SUBSCRIBED_DAILY_LIMIT}회)를 다 쓰셨어요. 내일 다시 이용해주세요.`
+          : `오늘 무료 체험 횟수(${UNSUBSCRIBED_DAILY_LIMIT}회)를 다 쓰셨어요. 구독하면 하루 ${SUBSCRIBED_DAILY_LIMIT}회까지 이용할 수 있어요.`,
+        limitReached: true,
+        subscribed,
+      },
+      429,
+    )
+  }
+
   let openaiResponse: Response
   try {
     openaiResponse = await fetch('https://api.openai.com/v1/responses', {
@@ -128,6 +176,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (!isDecodeResult(parsed)) {
     return jsonResponse({ error: 'OpenAI API output was missing expected fields.' }, 502)
   }
+
+  // Fire-and-forget past the response boundary via waitUntil — a failed
+  // usage-count write shouldn't fail an otherwise-successful decode result.
+  context.waitUntil(
+    supabaseAdminFetch(env, '/rpc/increment_decode_usage', {
+      method: 'POST',
+      body: JSON.stringify({ p_user_id: user.id, p_usage_date: usageDate }),
+    }).catch(() => {}),
+  )
 
   return jsonResponse(parsed, 200)
 }

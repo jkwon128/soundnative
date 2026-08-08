@@ -242,7 +242,11 @@ function App() {
       )}
       {screen === 'pricing' && <PricingScreen onBack={() => setScreen('home')} />}
       {screen === 'decode' && (
-        <DecodeScreen onBack={() => setScreen('home')} onOpenNotes={() => setScreen('notes')} />
+        <DecodeScreen
+          onBack={() => setScreen('home')}
+          onOpenNotes={() => setScreen('notes')}
+          onOpenPricing={() => setScreen('pricing')}
+        />
       )}
       {screen === 'notes' && (
         <NoteScreen onBack={() => setScreen('home')} onOpenDecode={() => setScreen('decode')} />

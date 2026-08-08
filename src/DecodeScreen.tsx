@@ -13,16 +13,18 @@ interface DecodeResult {
 interface DecodeScreenProps {
   onBack: () => void
   onOpenNotes: () => void
+  onOpenPricing: () => void
 }
 
 // Hardcoded per design — not backed by a data file, just a few common
 // phrases to help a first-time user see what to paste in.
 const EXAMPLE_PHRASES = ["You all set?", "I'll look into it.", "That's an interesting point."]
 
-function DecodeScreen({ onBack, onOpenNotes }: DecodeScreenProps) {
+function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps) {
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showUpgradeCta, setShowUpgradeCta] = useState(false)
   const [result, setResult] = useState<DecodeResult | null>(null)
 
   const { streak } = loadStreak()
@@ -45,18 +47,24 @@ function DecodeScreen({ onBack, onOpenNotes }: DecodeScreenProps) {
 
     setLoading(true)
     setError(null)
+    setShowUpgradeCta(false)
     setResult(null)
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+      if (!token) throw new Error('로그인이 필요합니다.')
+
       const response = await fetch('/api/decode', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ phrase }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
+        if (data?.limitReached) setShowUpgradeCta(!data.subscribed)
         throw new Error(data?.error || '분석에 실패했습니다.')
       }
 
@@ -138,8 +146,16 @@ function DecodeScreen({ onBack, onOpenNotes }: DecodeScreenProps) {
           <div className="font-body-md text-body-md text-warm-text-muted">분석 중...</div>
         )}
         {error && (
-          <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text">
-            {error}
+          <div className="bg-warm-error-bg border border-warm-error-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-error-text flex flex-col gap-sm">
+            <p>{error}</p>
+            {showUpgradeCta && (
+              <button
+                className="btn-warm-primary w-fit bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer"
+                onClick={onOpenPricing}
+              >
+                구독하러 가기
+              </button>
+            )}
           </div>
         )}
 
