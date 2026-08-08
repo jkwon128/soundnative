@@ -75,10 +75,6 @@ function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             시작하기 (Start)
             <span className="material-symbols-outlined text-lg">arrow_forward</span>
           </button>
-
-          <p className="font-body-md text-sm text-warm-text-muted">
-            No account required to explore.
-          </p>
         </div>
 
         <span className="material-symbols-outlined absolute bottom-md right-md text-warm-border text-2xl">
