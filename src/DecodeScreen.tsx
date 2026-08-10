@@ -10,6 +10,13 @@ interface DecodeResult {
   howToRespond: string
 }
 
+interface DecodeUsage {
+  used: number
+  limit: number
+  remaining: number
+  subscribed: boolean
+}
+
 interface DecodeScreenProps {
   onBack: () => void
   onOpenNotes: () => void
@@ -26,6 +33,7 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
   const [error, setError] = useState<string | null>(null)
   const [showUpgradeCta, setShowUpgradeCta] = useState(false)
   const [result, setResult] = useState<DecodeResult | null>(null)
+  const [usage, setUsage] = useState<DecodeUsage | null>(null)
 
   const { streak } = loadStreak()
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -40,6 +48,30 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
       setUserEmail(session?.user.email ?? null)
     })
     return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    supabase.auth.getSession().then(async ({ data }) => {
+      const token = data.session?.access_token
+      if (!token) return
+
+      try {
+        const response = await fetch('/api/decode-usage', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const info = await response.json()
+        if (!cancelled && response.ok) setUsage(info as DecodeUsage)
+      } catch {
+        // Best-effort — if this fails, the screen just doesn't show a
+        // remaining count rather than blocking anything.
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleDecode = async () => {
@@ -69,6 +101,9 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
       }
 
       setResult(data as DecodeResult)
+      setUsage((prev) =>
+        prev ? { ...prev, used: prev.used + 1, remaining: Math.max(0, prev.remaining - 1) } : prev,
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : '분석에 실패했습니다.')
     } finally {
@@ -97,6 +132,12 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
             AI TOOL · DECODE
           </span>
         </div>
+
+        {usage && (
+          <p className="font-body-md text-sm text-warm-text-muted">
+            오늘 {usage.remaining}/{usage.limit}회 남음
+          </p>
+        )}
 
         <div>
           <h1 className="font-warm-serif text-headline-md md:text-display-lg text-warm-text">

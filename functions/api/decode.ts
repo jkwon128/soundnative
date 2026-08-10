@@ -1,21 +1,14 @@
+import { getUserFromRequest, supabaseAdminFetch, type SupabaseEnv } from './_supabase'
 import {
-  getSubscriptionStatus,
-  getUserFromRequest,
-  hasAccess,
-  supabaseAdminFetch,
-  type SupabaseEnv,
-} from './_supabase'
+  getDecodeUsage,
+  SUBSCRIBED_DAILY_LIMIT,
+  todayUtcDateString,
+  UNSUBSCRIBED_DAILY_LIMIT,
+} from './_decodeUsage'
 
 interface Env extends SupabaseEnv {
   OPENAI_API_KEY: string
   OPENAI_MODEL?: string
-}
-
-const UNSUBSCRIBED_DAILY_LIMIT = 3
-const SUBSCRIBED_DAILY_LIMIT = 50
-
-function todayUtcDateString(): string {
-  return new Date().toISOString().slice(0, 10)
 }
 
 interface DecodeResult {
@@ -92,22 +85,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse({ error: '로그인이 필요합니다.' }, 401)
   }
 
-  const subscribed = hasAccess(await getSubscriptionStatus(env, user.id))
-  const dailyLimit = subscribed ? SUBSCRIBED_DAILY_LIMIT : UNSUBSCRIBED_DAILY_LIMIT
-  const usageDate = todayUtcDateString()
-
-  const usageResponse = await supabaseAdminFetch(
-    env,
-    `/decode_usage?user_id=eq.${encodeURIComponent(user.id)}&usage_date=eq.${usageDate}&select=count`,
-  )
-  if (!usageResponse.ok) {
-    const details = await usageResponse.text().catch(() => '')
-    return jsonResponse({ error: 'Failed to check usage.', details }, 502)
+  let used: number, limit: number, subscribed: boolean
+  try {
+    ;({ used, limit, subscribed } = await getDecodeUsage(env, user.id))
+  } catch (err) {
+    return jsonResponse(
+      { error: 'Failed to check usage.', details: err instanceof Error ? err.message : String(err) },
+      502,
+    )
   }
-  const usageRows = (await usageResponse.json().catch(() => [])) as { count?: number }[]
-  const usedToday = usageRows[0]?.count ?? 0
 
-  if (usedToday >= dailyLimit) {
+  if (used >= limit) {
     return jsonResponse(
       {
         error: subscribed
@@ -182,7 +170,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   context.waitUntil(
     supabaseAdminFetch(env, '/rpc/increment_decode_usage', {
       method: 'POST',
-      body: JSON.stringify({ p_user_id: user.id, p_usage_date: usageDate }),
+      body: JSON.stringify({ p_user_id: user.id, p_usage_date: todayUtcDateString() }),
     }).catch(() => {}),
   )
 
