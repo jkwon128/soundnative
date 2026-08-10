@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { loadStreak } from './dailyQuest'
+import { addDecodeNote, hasNoteForPhrase } from './notes'
 import { supabase } from './supabaseClient'
 import HomeLayout from './HomeLayout'
 
@@ -34,6 +35,12 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
   const [showUpgradeCta, setShowUpgradeCta] = useState(false)
   const [result, setResult] = useState<DecodeResult | null>(null)
   const [usage, setUsage] = useState<DecodeUsage | null>(null)
+  const [noteButtonState, setNoteButtonState] = useState<'idle' | 'panelOpen' | 'saved'>('idle')
+  const [noteMemoDraft, setNoteMemoDraft] = useState('')
+  // Distinguishes "this phrase was already saved before this decode" (label:
+  // "이미 노트에 있어요") from "just saved via the panel" (label: "노트에
+  // 추가됨") without needing a 4th noteButtonState value.
+  const [noteAlreadyExisted, setNoteAlreadyExisted] = useState(false)
 
   const { streak } = loadStreak()
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -81,6 +88,8 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
     setError(null)
     setShowUpgradeCta(false)
     setResult(null)
+    setNoteButtonState('idle')
+    setNoteMemoDraft('')
 
     try {
       const { data: sessionData } = await supabase.auth.getSession()
@@ -104,6 +113,9 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
       setUsage((prev) =>
         prev ? { ...prev, used: prev.used + 1, remaining: Math.max(0, prev.remaining - 1) } : prev,
       )
+      const alreadySaved = hasNoteForPhrase(phrase)
+      setNoteAlreadyExisted(alreadySaved)
+      if (alreadySaved) setNoteButtonState('saved')
     } catch (err) {
       setError(err instanceof Error ? err.message : '분석에 실패했습니다.')
     } finally {
@@ -201,24 +213,89 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
         )}
 
         {result && (
-          <div className="flex flex-col gap-sm">
-            {[
-              { label: '직역', value: result.literal },
-              { label: '진짜 속뜻', value: result.realMeaning },
-              { label: '톤', value: result.tone },
-              { label: '이렇게 답해보세요', value: result.howToRespond },
-            ].map((field) => (
-              <div
-                key={field.label}
-                className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md"
-              >
-                <div className="font-label-bold text-sm text-warm-text-muted tracking-wide uppercase mb-2">
-                  {field.label}
+          <>
+            <div className="flex flex-col gap-sm">
+              {[
+                { label: '직역', value: result.literal },
+                { label: '진짜 속뜻', value: result.realMeaning },
+                { label: '톤', value: result.tone },
+                { label: '이렇게 답해보세요', value: result.howToRespond },
+              ].map((field) => (
+                <div
+                  key={field.label}
+                  className="bg-warm-surface border border-warm-border rounded-warm-card shadow-warm-card p-md"
+                >
+                  <div className="font-label-bold text-sm text-warm-text-muted tracking-wide uppercase mb-2">
+                    {field.label}
+                  </div>
+                  <div className="font-body-md text-body-md text-warm-text">{field.value}</div>
                 </div>
-                <div className="font-body-md text-body-md text-warm-text">{field.value}</div>
+              ))}
+            </div>
+
+            {noteButtonState !== 'panelOpen' && (
+              <div className="flex">
+                {noteButtonState === 'saved' ? (
+                  <button
+                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-text-muted cursor-default"
+                    disabled
+                  >
+                    <span className="material-symbols-outlined text-base text-warm-success-text">
+                      check_circle
+                    </span>
+                    {noteAlreadyExisted ? '이미 노트에 있어요' : '노트에 추가됨'}
+                  </button>
+                ) : (
+                  <button
+                    className="flex items-center gap-1 ml-auto shrink-0 bg-warm-surface border border-warm-border rounded-full py-1 px-sm font-label-bold text-xs text-warm-primary cursor-pointer"
+                    onClick={() => setNoteButtonState('panelOpen')}
+                  >
+                    <span className="material-symbols-outlined text-base">bookmark_add</span>
+                    노트에 추가하기
+                  </button>
+                )}
               </div>
-            ))}
-          </div>
+            )}
+
+            {noteButtonState === 'panelOpen' && (
+              <div className="flex flex-col gap-sm bg-warm-bg-soft border border-warm-border rounded-warm-lg p-md">
+                <div className="flex flex-col gap-1">
+                  <p className="font-warm-serif text-body-lg text-warm-text">"{phrase}"</p>
+                  <p className="font-body-md text-body-md text-warm-text-muted">
+                    {result.realMeaning}
+                  </p>
+                </div>
+                <textarea
+                  autoFocus
+                  className="w-full min-h-16 bg-warm-surface border-2 border-warm-border rounded-warm-lg px-md py-sm font-body-md text-body-md text-warm-text focus:border-warm-primary focus:ring-0 transition-colors resize-y"
+                  placeholder="메모 추가 (선택)"
+                  value={noteMemoDraft}
+                  onChange={(e) => setNoteMemoDraft(e.target.value)}
+                />
+                <div className="flex gap-sm justify-end">
+                  <button
+                    className="font-label-bold text-label-bold text-warm-text-muted py-sm px-md rounded-full cursor-pointer"
+                    onClick={() => {
+                      setNoteButtonState('idle')
+                      setNoteMemoDraft('')
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="btn-warm-primary bg-warm-primary text-warm-on-primary font-label-bold text-label-bold py-sm px-md rounded-full cursor-pointer"
+                    onClick={() => {
+                      addDecodeNote(phrase, result, noteMemoDraft)
+                      setNoteButtonState('saved')
+                      setNoteMemoDraft('')
+                    }}
+                  >
+                    저장
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </HomeLayout>

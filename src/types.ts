@@ -39,4 +39,17 @@ export interface NoteEntry {
   memo?: string // optional note the user added on top of an auto-captured entry
   // type === 'manual'
   content?: string
+  // Distinguishes an 'auto' note's origin without a new `type` value —
+  // NoteScreen's rendering only branches on 'auto'/'manual', so a third
+  // `type` would fall into the 'manual' (content-only) rendering path and
+  // show an empty card. Undefined means "quest" for pre-existing notes.
+  source?: 'quest' | 'decode'
+  // Decode-only fields not shown by NoteScreen yet (see notes.ts's
+  // addDecodeNote) — realMeaning already lives in `meaning` above, so it's
+  // deliberately not duplicated here.
+  decodeExtra?: {
+    literal: string
+    tone: string
+    howToRespond: string
+  }
 }

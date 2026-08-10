@@ -85,3 +85,52 @@ export function addManualNote(content: string): void {
 export function deleteNote(id: string): void {
   saveNotes(loadNotes().filter((note) => note.id !== id))
 }
+
+// Mirrors DecodeScreen.tsx's DecodeResult shape. Declared inline rather than
+// imported — DecodeScreen imports from this module, so importing its type
+// back would be a circular import.
+interface DecodeNoteResult {
+  literal: string
+  realMeaning: string
+  tone: string
+  howToRespond: string
+}
+
+export function normalizePhrase(text: string): string {
+  return text.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+// Decode-specific dedup — unlike addAutoNote's questionId check, a freely
+// typed phrase has no stable id, so this compares normalized phrase text
+// instead. Checks across all notes regardless of `source`.
+export function hasNoteForPhrase(phrase: string): boolean {
+  const normalized = normalizePhrase(phrase)
+  return loadNotes().some((note) => note.phrase && normalizePhrase(note.phrase) === normalized)
+}
+
+// Saves a note for a Decode result, with an optional user-written memo on
+// top. No-ops (returning false) if this phrase was already saved, so
+// re-decoding the same sentence doesn't duplicate it.
+export function addDecodeNote(phrase: string, result: DecodeNoteResult, memo?: string): boolean {
+  if (hasNoteForPhrase(phrase)) return false
+
+  const trimmedMemo = memo?.trim()
+
+  const entry: NoteEntry = {
+    id: generateId(),
+    type: 'auto',
+    source: 'decode',
+    createdAt: new Date().toISOString(),
+    phrase: phrase.trim(),
+    meaning: result.realMeaning,
+    decodeExtra: {
+      literal: result.literal,
+      tone: result.tone,
+      howToRespond: result.howToRespond,
+    },
+    ...(trimmedMemo ? { memo: trimmedMemo } : {}),
+  }
+
+  saveNotes([entry, ...loadNotes()])
+  return true
+}
