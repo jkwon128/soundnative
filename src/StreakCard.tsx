@@ -1,8 +1,9 @@
-import { loadStreak, getTodayDateString } from './dailyQuest'
+import { loadStreak, getEffectiveStreak, getTodayDateString } from './dailyQuest'
 import WeekdayTracker from './WeekdayTracker'
 
 function StreakCard() {
-  const { streak, lastPlayedDate } = loadStreak()
+  const { lastPlayedDate } = loadStreak()
+  const streak = getEffectiveStreak()
   const playedToday = lastPlayedDate === getTodayDateString()
 
   const subtext =

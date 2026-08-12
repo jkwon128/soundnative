@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { loadStreak } from './dailyQuest'
+import { getEffectiveStreak } from './dailyQuest'
 import { addDecodeNote, hasNoteForPhrase } from './notes'
 import { supabase } from './supabaseClient'
 import HomeLayout from './HomeLayout'
@@ -42,7 +42,7 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
   // 추가됨") without needing a 4th noteButtonState value.
   const [noteAlreadyExisted, setNoteAlreadyExisted] = useState(false)
 
-  const { streak } = loadStreak()
+  const streak = getEffectiveStreak()
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
   useEffect(() => {

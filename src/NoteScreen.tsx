@@ -3,7 +3,7 @@ import { loadNotes, addManualNote, deleteNote } from './notes'
 import { CATEGORY_META } from './categoryMeta'
 import { groupNotesByDate, sortNotesNewestFirst } from './noteGrouping'
 import { loadCustomerEmail } from './customerEmail'
-import { loadStreak } from './dailyQuest'
+import { getEffectiveStreak } from './dailyQuest'
 import { supabase } from './supabaseClient'
 import HomeLayout from './HomeLayout'
 import type { QuizCategory } from './quizData'
@@ -33,7 +33,7 @@ function NoteScreen({ onBack, onOpenDecode }: NoteScreenProps) {
   const customerEmail = loadCustomerEmail()
   const canSendEmail = notes.length > 0 && Boolean(customerEmail)
 
-  const { streak } = loadStreak()
+  const streak = getEffectiveStreak()
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
   useEffect(() => {

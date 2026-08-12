@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ALL_SESSIONS, type QuestSession } from './questSessions'
-import { loadStreak, getTodayDateString } from './dailyQuest'
+import { loadStreak, getEffectiveStreak, getTodayDateString } from './dailyQuest'
 import { loadNotes } from './notes'
 import { loadCompletedSessionIds } from './sessionProgress'
 import { supabase } from './supabaseClient'
@@ -53,7 +53,8 @@ function isSameMonth(iso: string, reference: Date): boolean {
 }
 
 function HomeScreen({ isLocked, onOpenQuest, onOpenDecode, onOpenNotes, onOpenMyPage }: HomeScreenProps) {
-  const { streak, lastPlayedDate } = loadStreak()
+  const { lastPlayedDate } = loadStreak()
+  const streak = getEffectiveStreak()
   const playedToday = lastPlayedDate === getTodayDateString()
 
   // "Today"'s session is progress-based (the first session not yet

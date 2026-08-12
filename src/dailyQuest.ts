@@ -17,6 +17,23 @@ export function computeNextStreak(prev: StreakState, today: string): number {
   return 1
 }
 
+// True if lastPlayedDate is today or yesterday — the same "still unbroken"
+// condition computeNextStreak uses before deciding whether to increment,
+// applied here as a read-only check instead.
+function isStreakActive(lastPlayedDate: string | null, today: string): boolean {
+  if (!lastPlayedDate) return false
+  return lastPlayedDate === today || lastPlayedDate === getYesterdayDateString(today)
+}
+
+// The stored streak count is only ever updated on quest completion
+// (see QuestScreen), so it goes stale the moment a day is missed without
+// the user completing another quest to trigger a recompute. Display code
+// should read this instead of the raw stored value.
+export function getEffectiveStreak(): number {
+  const { streak, lastPlayedDate } = loadStreak()
+  return isStreakActive(lastPlayedDate, getTodayDateString()) ? streak : 0
+}
+
 export function loadStreak(): StreakState {
   try {
     const streak = Number(localStorage.getItem(STREAK_KEY) ?? '0')

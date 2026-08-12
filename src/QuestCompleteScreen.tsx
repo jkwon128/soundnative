@@ -1,4 +1,4 @@
-import { loadStreak } from './dailyQuest'
+import { getEffectiveStreak } from './dailyQuest'
 import WeekdayTracker from './WeekdayTracker'
 import Logo from './Logo'
 
@@ -12,7 +12,7 @@ interface QuestCompleteScreenProps {
 // App.tsx's screen state machine, which only ever transitions here from
 // that callback, never from a saved/persisted flag.
 function QuestCompleteScreen({ onOpenDecode, onOpenHome }: QuestCompleteScreenProps) {
-  const { streak } = loadStreak()
+  const streak = getEffectiveStreak()
 
   return (
     <div className="min-h-screen bg-warm-bg flex flex-col items-center">
