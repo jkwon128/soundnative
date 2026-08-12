@@ -12,6 +12,7 @@ import type { NoteEntry } from './types'
 interface NoteScreenProps {
   onBack: () => void
   onOpenDecode: () => void
+  onOpenMyPage: () => void
 }
 
 type EmailStatus = 'idle' | 'sending' | 'sent' | 'error'
@@ -22,7 +23,7 @@ function formatDate(iso: string): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
 }
 
-function NoteScreen({ onBack, onOpenDecode }: NoteScreenProps) {
+function NoteScreen({ onBack, onOpenDecode, onOpenMyPage }: NoteScreenProps) {
   const [notes, setNotes] = useState<NoteEntry[]>(() => loadNotes())
   const [isWriting, setIsWriting] = useState(false)
   const [draft, setDraft] = useState('')
@@ -114,6 +115,7 @@ function NoteScreen({ onBack, onOpenDecode }: NoteScreenProps) {
       activeTab="notes"
       streak={streak}
       userEmail={userEmail}
+      onOpenMyPage={onOpenMyPage}
       onOpenHome={onBack}
       onOpenDecode={onOpenDecode}
       onOpenNotes={() => {}}

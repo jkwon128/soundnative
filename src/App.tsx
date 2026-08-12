@@ -246,10 +246,15 @@ function App() {
           onBack={() => setScreen('home')}
           onOpenNotes={() => setScreen('notes')}
           onOpenPricing={() => setScreen('pricing')}
+          onOpenMyPage={() => setScreen('myPage')}
         />
       )}
       {screen === 'notes' && (
-        <NoteScreen onBack={() => setScreen('home')} onOpenDecode={() => setScreen('decode')} />
+        <NoteScreen
+          onBack={() => setScreen('home')}
+          onOpenDecode={() => setScreen('decode')}
+          onOpenMyPage={() => setScreen('myPage')}
+        />
       )}
       {screen === 'checkoutSuccess' && checkoutId && (
         <CheckoutSuccessScreen checkoutId={checkoutId} onDone={() => setScreen('home')} />

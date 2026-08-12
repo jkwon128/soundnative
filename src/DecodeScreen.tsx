@@ -22,13 +22,14 @@ interface DecodeScreenProps {
   onBack: () => void
   onOpenNotes: () => void
   onOpenPricing: () => void
+  onOpenMyPage: () => void
 }
 
 // Hardcoded per design — not backed by a data file, just a few common
 // phrases to help a first-time user see what to paste in.
 const EXAMPLE_PHRASES = ["You all set?", "I'll look into it.", "That's an interesting point."]
 
-function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps) {
+function DecodeScreen({ onBack, onOpenNotes, onOpenPricing, onOpenMyPage }: DecodeScreenProps) {
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -128,6 +129,7 @@ function DecodeScreen({ onBack, onOpenNotes, onOpenPricing }: DecodeScreenProps)
       activeTab="decode"
       streak={streak}
       userEmail={userEmail}
+      onOpenMyPage={onOpenMyPage}
       onOpenHome={onBack}
       onOpenDecode={() => {}}
       onOpenNotes={onOpenNotes}
