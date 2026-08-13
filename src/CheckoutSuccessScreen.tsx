@@ -7,6 +7,7 @@ interface CheckoutStatusInfo {
   customerEmail: string | null
   amount: number
   currency: string
+  isTrial: boolean
 }
 
 interface CheckoutSuccessScreenProps {
@@ -14,8 +15,9 @@ interface CheckoutSuccessScreenProps {
   onDone: () => void
 }
 
-// `amount === 0` on a completed checkout means the trial deferred the
-// charge — nothing was billed today. See handling below.
+// Shown only when the checkout actually carried a trial period
+// (info.isTrial) — a $0 total from a 100%-off discount code is not a trial
+// and should fall through to the regular success copy below.
 const TRIAL_START_COPY = {
   icon: 'check_circle',
   title: '3일 무료 체험이 시작됐어요!',
@@ -83,7 +85,7 @@ function CheckoutSuccessScreen({ checkoutId, onDone }: CheckoutSuccessScreenProp
   }, [checkoutId])
 
   const copy = info
-    ? info.status === 'succeeded' && info.amount === 0
+    ? info.status === 'succeeded' && info.isTrial
       ? TRIAL_START_COPY
       : STATUS_COPY[info.status]
     : null

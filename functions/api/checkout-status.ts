@@ -6,6 +6,11 @@ interface PolarCheckout {
   total_amount: number
   currency: string
   product: { name: string } | null
+  // Set only when a trial period actually applies to this checkout — null
+  // for a full-price or discounted-to-$0 purchase. See CheckoutSuccessScreen,
+  // which used to infer "trial" from total_amount === 0 and got that wrong
+  // once discount codes could also produce a $0 total.
+  trial_end: string | null
 }
 
 interface CheckoutStatusInfo {
@@ -14,6 +19,7 @@ interface CheckoutStatusInfo {
   customerEmail: string | null
   amount: number
   currency: string
+  isTrial: boolean
 }
 
 // GET /api/checkout-status?checkout_id=... — lets the success screen confirm
@@ -58,6 +64,7 @@ export const onRequestGet: PagesFunction<PolarEnv> = async (context) => {
     customerEmail: checkout.customer_email,
     amount: checkout.total_amount,
     currency: checkout.currency,
+    isTrial: checkout.trial_end !== null,
   }
 
   return jsonResponse(info, 200)
