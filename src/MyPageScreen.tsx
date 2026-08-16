@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import useSubscription from './useSubscription'
+import { loadStreak, getEffectiveStreak } from './dailyQuest'
 
 interface MyPageScreenProps {
   onBack: () => void
@@ -54,6 +55,21 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
   const subscription = useSubscription()
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState<string | null>(null)
+
+  // getEffectiveStreak (not the raw stored value) matches how the rest of
+  // the app displays the current streak — it reads as 0 once a day's been
+  // missed, even before the next quest completion recomputes the stored
+  // number. bestStreak has no such staleness concern; it only ever moves
+  // up, on quest completion (see dailyQuest.ts's saveStreak).
+  const currentStreak = getEffectiveStreak()
+  const { bestStreak } = loadStreak()
+  const streakLine = currentStreak === 0 ? '아직 시작 전이에요' : `현재 스트릭 · ${currentStreak}일`
+  const bestStreakLine =
+    bestStreak === 0
+      ? null
+      : currentStreak === bestStreak
+        ? '현재 최고 기록이에요'
+        : `최고 기록 · ${bestStreak}일`
 
   useEffect(() => {
     // getSession() reads the already-established local session directly
@@ -184,6 +200,16 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
               {provider && createdAt && ' · '}
               {createdAt && `${formatDate(createdAt)} 가입`}
             </p>
+          </div>
+        </div>
+
+        <div className="bg-warm-surface border border-warm-border rounded-warm-card p-md flex flex-col gap-sm">
+          <div className="font-label-bold text-label-bold text-warm-text-muted">스트릭</div>
+          <div className="flex flex-col gap-1">
+            <p className="font-body-lg text-body-lg text-warm-text">{streakLine}</p>
+            {bestStreakLine && (
+              <p className="font-body-md text-sm text-warm-text-muted">{bestStreakLine}</p>
+            )}
           </div>
         </div>
 
