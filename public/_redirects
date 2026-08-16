@@ -1,0 +1,4 @@
+# Canonicalize to the custom domain so Google/Naver don't see the same
+# content served from two hostnames. Cloudflare Pages evaluates this before
+# serving static assets, regardless of which domain the request came in on.
+https://soundnative.pages.dev/* https://soundnative.org/:splat 301!
