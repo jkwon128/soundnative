@@ -1,8 +1,12 @@
 import { getDayIndex } from './dateUtils'
 import { loadStreak, getTodayDateString } from './dailyQuest'
+import BilingualText from './BilingualText'
 
 // Korean short weekday label, indexed by Date#getUTCDay() (0 = Sun).
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
+// Single-letter English abbreviations, same index — Tue/Thu both "T" and
+// Sat/Sun both "S" is the standard calendar-strip convention, not a bug.
+const WEEKDAY_LABELS_EN = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 // Pure date-string math kept local rather than added to dateUtils.ts — that
 // file is shared with the streak data layer, which we're leaving untouched.
@@ -13,9 +17,9 @@ function addDays(dateString: string, delta: number): string {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
 }
 
-function weekdayLabel(dateString: string): string {
+function weekdayIndex(dateString: string): number {
   const [year, month, day] = dateString.split('-').map(Number)
-  return WEEKDAY_LABELS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()]
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay()
 }
 
 // A day counts as completed if it falls within the most recent `streakCount`
@@ -28,11 +32,18 @@ function isDayCompleted(dateString: string, lastPlayedDate: string | null, strea
   return offset >= 0 && offset < streakCount
 }
 
+interface WeekdayTrackerProps {
+  // Off by default so QuestCompleteScreen's existing call site (unchanged)
+  // keeps rendering Korean-only, exactly as before. Home's StreakCard opts
+  // in explicitly.
+  bilingual?: boolean
+}
+
 // A rolling 7-day window ending today (today is always the rightmost cell) —
 // shared by StreakCard (Home) and QuestCompleteScreen (post-session
 // celebration), self-contained so either can drop it in without threading
 // streak data through props.
-function WeekdayTracker() {
+function WeekdayTracker({ bilingual = false }: WeekdayTrackerProps) {
   const { streak, lastPlayedDate } = loadStreak()
   const today = getTodayDateString()
   const last7Days = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6))
@@ -42,12 +53,18 @@ function WeekdayTracker() {
       {last7Days.map((dateString) => {
         const isToday = dateString === today
         const completed = isDayCompleted(dateString, lastPlayedDate, streak)
+        const dayIndex = weekdayIndex(dateString)
 
         return (
           <div key={dateString} className="flex flex-col items-center gap-1">
-            <span className="font-label-bold text-xs text-warm-text-muted">
-              {weekdayLabel(dateString)}
-            </span>
+            <BilingualText
+              mode={bilingual ? 'bilingual' : 'ko'}
+              ko={WEEKDAY_LABELS[dayIndex]}
+              en={WEEKDAY_LABELS_EN[dayIndex]}
+              className="items-center"
+              koClassName="font-label-bold text-xs text-warm-text-muted"
+              enClassName="text-[9px] leading-none"
+            />
             <span
               className={`h-8 w-8 rounded-full flex items-center justify-center ${
                 completed

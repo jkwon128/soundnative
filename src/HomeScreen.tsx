@@ -7,6 +7,8 @@ import { supabase } from './supabaseClient'
 import HomeLayout from './HomeLayout'
 import StreakCard from './StreakCard'
 import QuestPreviewCard from './QuestPreviewCard'
+import BilingualText, { type BilingualTextValue } from './BilingualText'
+import { homeStrings, formatBilingual } from './i18n/homeStrings'
 
 interface HomeScreenProps {
   isLocked: boolean
@@ -18,8 +20,8 @@ interface HomeScreenProps {
 
 interface NavCardProps {
   icon: string
-  title: string
-  subtitle: string
+  title: BilingualTextValue
+  subtitle: BilingualTextValue
   onClick: () => void
 }
 
@@ -33,12 +35,19 @@ function NavCard({ icon, title, subtitle, onClick }: NavCardProps) {
         <span className="material-symbols-outlined text-xl">{icon}</span>
       </span>
       <span className="flex-1 min-w-0">
-        <span className="block font-label-bold text-body-lg text-warm-text text-pretty">
-          {title}
-        </span>
-        <span className="block font-body-md text-sm text-warm-text-muted text-pretty">
-          {subtitle}
-        </span>
+        <BilingualText
+          ko={title.ko}
+          en={title.en}
+          koClassName="font-label-bold text-body-lg text-warm-text text-pretty"
+          enClassName="text-sm text-pretty"
+        />
+        <BilingualText
+          className="mt-0.5"
+          ko={subtitle.ko}
+          en={subtitle.en}
+          koClassName="font-body-md text-sm text-warm-text-muted text-pretty"
+          enClassName="text-[11px] text-pretty"
+        />
       </span>
       <span className="material-symbols-outlined text-xl text-warm-text-muted shrink-0">
         chevron_right
@@ -131,8 +140,8 @@ function HomeScreen({ isLocked, onOpenQuest, onOpenDecode, onOpenNotes, onOpenMy
           <div className="order-3">
             <NavCard
               icon="auto_awesome"
-              title="지금 급한 말이 있어요"
-              subtitle="원어민이 한 말, 진짜 속뜻 바로 풀기"
+              title={homeStrings.decodeCard.title}
+              subtitle={homeStrings.decodeCard.subtitle}
               onClick={onOpenDecode}
             />
           </div>
@@ -140,8 +149,11 @@ function HomeScreen({ isLocked, onOpenQuest, onOpenDecode, onOpenNotes, onOpenMy
           <div className="order-4">
             <NavCard
               icon="bookmark_add"
-              title="표현 노트"
-              subtitle={`저장한 표현 ${noteCount}개 · 이번 달 ${notesThisMonth}개`}
+              title={homeStrings.notesCard.title}
+              subtitle={formatBilingual(homeStrings.notesCard.subtitle, {
+                count: noteCount,
+                monthCount: notesThisMonth,
+              })}
               onClick={onOpenNotes}
             />
           </div>
