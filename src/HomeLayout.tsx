@@ -22,7 +22,7 @@ interface HomeLayoutProps {
   children: ReactNode
 }
 
-// Shared shell reused by every screen that has the "오늘 | Decode | 노트" tab
+// Shared shell reused by every screen that has the "Today | Decode | Notes" tab
 // control — Home and Decode so far. Whichever screen embeds this passes its
 // own key as `activeTab`; the other two tabs just navigate away (their
 // target screens are unchanged, separate full-screen components).
@@ -37,9 +37,9 @@ function HomeLayout({
   children,
 }: HomeLayoutProps) {
   const tabs: HomeTab[] = [
-    { key: 'today', label: '오늘', icon: 'today', onSelect: onOpenHome },
+    { key: 'today', label: 'Today', icon: 'today', onSelect: onOpenHome },
     { key: 'decode', label: 'Decode', icon: 'graphic_eq', onSelect: onOpenDecode },
-    { key: 'notes', label: '노트', icon: 'bookmark', onSelect: onOpenNotes },
+    { key: 'notes', label: 'Notes', icon: 'bookmark', onSelect: onOpenNotes },
   ]
 
   const renderTabs = (variant: 'header' | 'floating') => (
@@ -53,7 +53,7 @@ function HomeLayout({
       {tabs.map((tab) => (
         <button
           key={tab.key}
-          className={`px-md py-1.5 rounded-full font-label-bold text-label-bold cursor-pointer transition-colors ${
+          className={`px-4 py-1.5 rounded-full font-label-bold text-label-bold cursor-pointer transition-colors ${
             tab.key === activeTab
               ? 'bg-warm-primary text-warm-on-primary'
               : 'text-warm-text-muted hover:text-warm-text'
