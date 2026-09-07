@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
 import { saveCustomerEmail } from './customerEmail'
+import {
+  trackPurchase,
+  trackStartTrial,
+  hasTrackedCheckout,
+  markCheckoutTracked,
+} from './analytics'
 
 interface CheckoutStatusInfo {
   status: 'open' | 'expired' | 'confirmed' | 'succeeded' | 'failed'
@@ -71,7 +77,26 @@ function CheckoutSuccessScreen({ checkoutId, onDone }: CheckoutSuccessScreenProp
         // send them anything to — capture it once here instead of asking
         // again anywhere else in the app.
         if (statusInfo.customerEmail) saveCustomerEmail(statusInfo.customerEmail)
-        if (!cancelled) setInfo(statusInfo)
+        if (!cancelled) {
+          setInfo(statusInfo)
+          if (statusInfo.status === 'succeeded' && !hasTrackedCheckout(checkoutId)) {
+            if (statusInfo.isTrial) {
+              trackStartTrial({
+                transactionId: checkoutId,
+                currency: statusInfo.currency,
+                productName: statusInfo.productName,
+              })
+            } else {
+              trackPurchase({
+                transactionId: checkoutId,
+                amount: statusInfo.amount,
+                currency: statusInfo.currency,
+                productName: statusInfo.productName,
+              })
+            }
+            markCheckoutTracked(checkoutId)
+          }
+        }
       })
       .catch((err) => {
         if (!cancelled) {

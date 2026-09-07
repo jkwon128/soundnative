@@ -2,6 +2,12 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import { saveUserProfile, savePendingOnboardingProfile } from './userProfile'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
+import {
+  trackSignUp,
+  trackLogin,
+  trackSignUpConfirmationSent,
+  stashPendingGoogleAuthMode,
+} from './analytics'
 
 const TOTAL_ONBOARDING_STEPS = 5
 
@@ -83,9 +89,11 @@ function AuthScreen({
         // click the link in their inbox.
         if (data.session) {
           saveOnboardingProfile(data.session.user.id)
+          trackSignUp('email')
           onContinue()
         } else {
           stashOnboardingProfileForLater()
+          trackSignUpConfirmationSent()
           setConfirmationSent(true)
         }
       } else {
@@ -95,6 +103,7 @@ function AuthScreen({
         })
         if (signInError) throw signInError
         saveOnboardingProfile(data.user.id)
+        trackLogin('email')
         onContinue()
       }
     } catch (err) {
@@ -150,6 +159,7 @@ function AuthScreen({
     // App.tsx's getSession() check on mount picks up. React remounts from
     // scratch on the way back, so stash the answers now or they're gone.
     stashOnboardingProfileForLater()
+    stashPendingGoogleAuthMode(mode)
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },

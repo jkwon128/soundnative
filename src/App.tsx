@@ -22,6 +22,7 @@ import { loadStreak, getTodayDateString } from './dailyQuest'
 import { saveUserProfile, takePendingOnboardingProfile } from './userProfile'
 import type { QuestSession } from './questSessions'
 import type { EnglishLevel, LearningGoal, UserStatus, VisitFrequency } from './types'
+import { trackScreenView, trackPaywallView, trackPendingGoogleAuth } from './analytics'
 
 type Screen =
   | 'welcome'
@@ -75,6 +76,13 @@ function App() {
   const isQuestLocked = streak >= 3 && lastPlayedDate !== getTodayDateString() && !hasAccess(subscription.status)
 
   useEffect(() => {
+    // Fires the funnel's screen_view for every step (landing, teaser quiz,
+    // onboarding survey, auth, home, pricing, checkout success, ...) from
+    // one place instead of scattering a call across every screen component.
+    trackScreenView(screen)
+  }, [screen])
+
+  useEffect(() => {
     // Right after a checkout, give the Polar webhook a moment to land before
     // the user hits "홈으로" — otherwise the entitlement check below can
     // still see the pre-checkout state and bounce them back to the paywall.
@@ -99,6 +107,9 @@ function App() {
         if (pendingProfile) {
           void saveUserProfile(data.session.user.id, pendingProfile)
         }
+        // A no-op unless AuthScreen's Google button stashed a signUp/logIn
+        // intent right before redirecting away — see stashPendingGoogleAuthMode.
+        trackPendingGoogleAuth()
         if (!checkoutId) {
           setScreen('home')
         }
@@ -212,6 +223,7 @@ function App() {
           isLocked={isQuestLocked}
           onOpenQuest={(session) => {
             if (isQuestLocked) {
+              trackPaywallView('streak_locked')
               setScreen('pricing')
               return
             }
@@ -237,7 +249,10 @@ function App() {
           // hitting it, show the paywall once before returning home. Every
           // later completion has streak > 3 (paywall already gated getting
           // there), so this never re-fires.
-          onOpenHome={() => setScreen(streak === 3 ? 'pricing' : 'home')}
+          onOpenHome={() => {
+            if (streak === 3) trackPaywallView('trial_streak_complete')
+            setScreen(streak === 3 ? 'pricing' : 'home')
+          }}
         />
       )}
       {screen === 'pricing' && <PricingScreen onBack={() => setScreen('home')} />}

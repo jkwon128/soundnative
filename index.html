@@ -8,7 +8,11 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-G8115WZ6KG');
+      // This is a client-routed single-page app (no URL changes between
+      // screens), so the funnel's screen_view events are fired manually
+      // from App.tsx instead — send_page_view:false avoids double-counting
+      // the initial landing view.
+      gtag('config', 'G-G8115WZ6KG', { send_page_view: false });
     </script>
     <!-- Microsoft Clarity -->
     <script type="text/javascript">

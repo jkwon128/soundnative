@@ -3,6 +3,7 @@
 // milestone (soft paywall) is implemented. Do not delete until then.
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import { trackViewPricing, trackBeginCheckout } from './analytics'
 
 interface PricingInfo {
   name: string
@@ -43,7 +44,10 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
       .then(async (response) => {
         const data = await response.json()
         if (!response.ok) throw new Error(data?.error || '가격 정보를 불러오지 못했습니다.')
-        if (!cancelled) setPricing(data as PricingInfo)
+        if (!cancelled) {
+          setPricing(data as PricingInfo)
+          trackViewPricing(data as PricingInfo)
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -74,6 +78,7 @@ function PricingScreen({ onBack, skipLabel = '홈으로' }: PricingScreenProps) 
       if (!response.ok || !data?.url) {
         throw new Error(data?.error || '결제 페이지를 여는 데 실패했습니다.')
       }
+      if (pricing) trackBeginCheckout(pricing)
       window.location.href = data.url
     } catch (err) {
       setCheckoutError(err instanceof Error ? err.message : '결제 페이지를 여는 데 실패했습니다.')
