@@ -84,6 +84,18 @@ export function clearStreak(): void {
   }
 }
 
+// Unlike clearStreak, wipes bestStreak too — for when the account behind
+// this progress is gone (account deletion), not just a testing reset.
+export function clearAllStreakData(): void {
+  try {
+    localStorage.removeItem(STREAK_KEY)
+    localStorage.removeItem(LAST_PLAYED_KEY)
+    localStorage.removeItem(BEST_STREAK_KEY)
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}
+
 // Dev-only override so the day-indexed item shown (a session, previously a
 // single question) can be forced without waiting for the real date to
 // change. Not written to by normal app logic.

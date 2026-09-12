@@ -59,3 +59,13 @@ export function hasCompletedOnboarding(): boolean {
     return false
   }
 }
+
+export function clearOnboardingSituations(): void {
+  try {
+    localStorage.removeItem(ONBOARDING_SITUATIONS_KEY)
+    localStorage.removeItem(ONBOARDING_LEVEL_KEY)
+    localStorage.removeItem(ONBOARDING_COMPLETED_KEY)
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}

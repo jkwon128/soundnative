@@ -86,6 +86,14 @@ export function deleteNote(id: string): void {
   saveNotes(loadNotes().filter((note) => note.id !== id))
 }
 
+export function clearNotes(): void {
+  try {
+    localStorage.removeItem(NOTES_KEY)
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}
+
 // Mirrors DecodeScreen.tsx's DecodeResult shape. Declared inline rather than
 // imported — DecodeScreen imports from this module, so importing its type
 // back would be a circular import.

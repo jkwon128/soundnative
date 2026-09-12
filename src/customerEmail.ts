@@ -19,3 +19,11 @@ export function loadCustomerEmail(): string | null {
     return null
   }
 }
+
+export function clearCustomerEmail(): void {
+  try {
+    localStorage.removeItem(CUSTOMER_EMAIL_KEY)
+  } catch {
+    // localStorage unavailable (e.g. private browsing) — ignore
+  }
+}

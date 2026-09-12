@@ -1,7 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import useSubscription from './useSubscription'
-import { loadStreak, getEffectiveStreak } from './dailyQuest'
+import { loadStreak, getEffectiveStreak, clearAllStreakData } from './dailyQuest'
+import { clearNotes } from './notes'
+import { clearCompletedSessions } from './sessionProgress'
+import { clearOnboardingSituations } from './situations'
+import { clearCustomerEmail } from './customerEmail'
 
 interface MyPageScreenProps {
   onBack: () => void
@@ -169,6 +173,17 @@ function MyPageScreen({ onBack, onLoggedOut }: MyPageScreenProps) {
       // caller's own account, enforced by Postgres itself.
       const { error } = await supabase.rpc('delete_user')
       if (error) throw error
+
+      // All quest/streak/note progress lives in localStorage, keyed by
+      // device rather than by account (see dailyQuest.ts, notes.ts,
+      // sessionProgress.ts, situations.ts) — without this, a deleted
+      // account's leftover progress would still show up on this device
+      // for whoever logs in next.
+      clearAllStreakData()
+      clearNotes()
+      clearCompletedSessions()
+      clearOnboardingSituations()
+      clearCustomerEmail()
 
       await supabase.auth.signOut()
       onLoggedOut()
